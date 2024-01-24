@@ -47,18 +47,14 @@ public class Student {
         newDailyStatistic.setDate(updatedDate);
 
         aggregableData.getStatisticManager().setStatisticValue(updatedDate, newDailyStatistic);
-        syncGrades(updatedDate);
+        syncGradesByDate(updatedDate);
     }
 
-    public void syncGrades(LocalDate updatedDate) {
+    public void syncGradesByDate(LocalDate updatedDate) {
         aggregableData.syncDailyGrade(updatedDate, schedule.getStudyDay(updatedDate.getDayOfWeek()));
 
         DateRange weekRange = DateRange.calculateWeekRange(updatedDate);
         aggregableData.syncWeeklyGrade(weekRange, subjects);
-    }
-
-    public void sync() {
-
     }
 
     private static Statistic sumSubjectStatistics(LocalDate date, List<Subject> subjects) {

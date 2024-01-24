@@ -104,6 +104,7 @@ public class Screens {
         float goalValue = Float.parseFloat(readConsoleNextLine());
 
         subject.getGoals().setWeeklyGoal(statisticType, goalValue);
+        student.syncGradesByDate(currentDate);
     }
 
     public static void skipDay() {

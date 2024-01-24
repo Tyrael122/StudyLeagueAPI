@@ -1,6 +1,8 @@
 package br.studyleague.api.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public record DateRange(LocalDate startDate, LocalDate endDate) {
     public static DateRange calculateWeekRange(LocalDate date) {
@@ -15,6 +17,16 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
         var end = start.plusDays(start.lengthOfMonth() - 1);
 
         return new DateRange(start, end);
+    }
+
+    public List<LocalDate> getDaysInRange() {
+        List<LocalDate> days = new ArrayList<>();
+
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
+            days.add(date);
+        }
+
+        return days;
     }
 
     public boolean contains(DateRange range) {
