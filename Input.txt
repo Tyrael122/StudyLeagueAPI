@@ -1,0 +1,18 @@
+Kauan
+Direito
+Artes
+Física
+fim
+Artes
+Quarta
+15:00 - 16:00
+Física
+Quinta
+12:00 - 14:00
+fim
+20
+5
+4
+20
+5
+4
