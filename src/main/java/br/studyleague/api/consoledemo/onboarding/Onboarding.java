@@ -1,7 +1,7 @@
 package br.studyleague.api.consoledemo.onboarding;
 
 import br.studyleague.api.model.goals.Goal;
-import br.studyleague.api.model.statistics.StatisticType;
+import br.studyleague.api.model.aggregabledata.statistics.StatisticType;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.goals.SubjectGoals;

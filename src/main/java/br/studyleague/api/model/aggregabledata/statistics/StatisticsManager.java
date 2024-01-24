@@ -1,4 +1,4 @@
-package br.studyleague.api.model.statistics;
+package br.studyleague.api.model.aggregabledata.statistics;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

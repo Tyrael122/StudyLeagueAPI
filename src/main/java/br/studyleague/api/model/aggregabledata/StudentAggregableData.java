@@ -1,7 +1,10 @@
-package br.studyleague.api.model.statistics;
+package br.studyleague.api.model.aggregabledata;
 
-import br.studyleague.api.model.DateRange;
-import br.studyleague.api.model.student.StudyDay;
+import br.studyleague.api.model.aggregabledata.grade.Grade;
+import br.studyleague.api.model.aggregabledata.grade.WeeklyGrade;
+import br.studyleague.api.model.aggregabledata.statistics.DailyStatisticsManager;
+import br.studyleague.api.model.util.DateRange;
+import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.AggregableArrayList;
 import br.studyleague.api.model.util.aggregable.AggregableList;

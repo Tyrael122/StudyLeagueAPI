@@ -1,6 +1,6 @@
 package br.studyleague.api.consoledemo.onboarding;
 
-import br.studyleague.api.model.ScheduleEntry;
+import br.studyleague.api.model.student.schedule.ScheduleEntry;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
 

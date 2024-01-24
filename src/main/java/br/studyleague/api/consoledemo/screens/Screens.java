@@ -1,12 +1,13 @@
 package br.studyleague.api.consoledemo.screens;
 
-import br.studyleague.api.model.ScheduleEntry;
+import br.studyleague.api.model.student.schedule.ScheduleEntry;
 import br.studyleague.api.model.goals.Goal;
-import br.studyleague.api.model.statistics.StatisticType;
+import br.studyleague.api.model.aggregabledata.statistics.StatisticType;
 import br.studyleague.api.model.student.Student;
-import br.studyleague.api.model.student.StudyDay;
+import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.DailyDataParser;
+import br.studyleague.api.model.util.aggregable.RangedDataParser;
 
 import java.time.LocalDate;
 

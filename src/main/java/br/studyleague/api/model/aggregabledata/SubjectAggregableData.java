@@ -1,5 +1,6 @@
-package br.studyleague.api.model.statistics;
+package br.studyleague.api.model.aggregabledata;
 
+import br.studyleague.api.model.aggregabledata.statistics.DailyStatisticsManager;
 import jakarta.persistence.*;
 import lombok.Data;
 

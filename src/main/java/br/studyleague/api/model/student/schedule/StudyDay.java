@@ -1,6 +1,5 @@
-package br.studyleague.api.model.student;
+package br.studyleague.api.model.student.schedule;
 
-import br.studyleague.api.model.ScheduleEntry;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;

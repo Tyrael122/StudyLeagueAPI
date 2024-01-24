@@ -1,8 +1,6 @@
-package br.studyleague.api.consoledemo.screens;
+package br.studyleague.api.model.util.aggregable;
 
-import br.studyleague.api.model.DateRange;
-import br.studyleague.api.model.util.aggregable.AggregableList;
-import br.studyleague.api.model.util.aggregable.RangedAggregable;
+import br.studyleague.api.model.util.DateRange;
 
 import java.time.LocalDate;
 import java.util.List;

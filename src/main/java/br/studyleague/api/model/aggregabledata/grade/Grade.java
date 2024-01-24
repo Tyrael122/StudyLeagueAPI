@@ -1,4 +1,4 @@
-package br.studyleague.api.model.statistics;
+package br.studyleague.api.model.aggregabledata.grade;
 
 import br.studyleague.api.model.util.aggregable.DailyAggregable;
 import jakarta.persistence.Entity;

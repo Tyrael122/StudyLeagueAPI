@@ -1,6 +1,6 @@
-package br.studyleague.api.model.statistics;
+package br.studyleague.api.model.aggregabledata.grade;
 
-import br.studyleague.api.model.DateRange;
+import br.studyleague.api.model.util.DateRange;
 import br.studyleague.api.model.util.aggregable.RangedAggregable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

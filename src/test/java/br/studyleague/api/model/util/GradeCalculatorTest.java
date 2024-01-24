@@ -1,7 +1,6 @@
 package br.studyleague.api.model.util;
 
-import br.studyleague.api.model.DateRange;
-import br.studyleague.api.model.statistics.StatisticType;
+import br.studyleague.api.model.aggregabledata.statistics.StatisticType;
 import br.studyleague.api.model.subject.Subject;
 import org.junit.jupiter.api.Test;
 

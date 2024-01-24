@@ -1,4 +1,4 @@
-package br.studyleague.api.model;
+package br.studyleague.api.model.util;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

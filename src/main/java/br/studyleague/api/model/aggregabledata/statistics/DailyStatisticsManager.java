@@ -1,4 +1,4 @@
-package br.studyleague.api.model.statistics;
+package br.studyleague.api.model.aggregabledata.statistics;
 
 import br.studyleague.api.model.util.aggregable.AggregableArrayList;
 import br.studyleague.api.model.util.aggregable.AggregableList;
