@@ -2,11 +2,9 @@ package br.studyleague.api.model.student;
 
 import br.studyleague.api.model.student.schedule.Schedule;
 import br.studyleague.api.model.util.DateRange;
-import br.studyleague.api.model.util.aggregable.AggregableList;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.aggregabledata.StudentAggregableData;
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.api.model.util.aggregable.DailyDataParser;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Delegate;
@@ -27,17 +25,17 @@ public class Student {
     private String studyArea;
     private String goal;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Subject> subjects = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Schedule schedule = new Schedule();
 
-    @OneToOne
     @Delegate
+    @OneToOne(cascade = CascadeType.ALL)
     private StudentAggregableData aggregableData = new StudentAggregableData();
 
-    public AggregableList<Statistic> getDailyStatistics() {
+    public List<Statistic> getDailyStatistics() {
         return aggregableData.getStatisticManager().getRawStatistics();
     }
 
@@ -61,7 +59,7 @@ public class Student {
     private static Statistic sumSubjectStatistics(LocalDate date, List<Subject> subjects) {
         List<Statistic> subjectStatistics = new ArrayList<>();
         for (Subject subject : subjects) {
-            Statistic subjectStatistic = DailyDataParser.of(subject.getDailyStatistics()).getDailyDataOrDefault(date);
+            Statistic subjectStatistic = Statistic.parse(subject.getDailyStatistics()).getDailyDataOrDefault(date);
             subjectStatistics.add(subjectStatistic);
         }
 

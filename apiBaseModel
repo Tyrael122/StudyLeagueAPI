@@ -1,0 +1,19 @@
+Draft of endpoints of the API.
+
+/student/{id} - POST - Creates a new student
+/student/{id} - GET - Get a student by id
+
+/student/{id}/schedule - POST - Creates a new schedule for a student, or updates the existing one.
+/student/{id}/schedule - GET - Get the schedule of a student by id
+
+/student/{id}/subjects - POST - Creates a new subject for a student, or updates the existing ones.
+/student/{id}/subjects/{id}/ - GET - Get the subjects of a student by id
+
+/student/{id}/subjects/{id}/goals - POST - Creates a new goal for a subject, or updates the existing ones.
+/student/{id}/subjects/{id}/goals - GET - Get the goals of a subject by id
+
+/student/{id}/subjects/{id}/stats - POST - Creates a new stat for a subject, or updates the existing ones.
+/student/{id}/subjects/{id}/stats - GET - Get the stats of a subject by id
+
+/student/{id}/stats - GET - Get the stats of a student by id
+/student/{id}/grades - GET - Get the grades of a student by id

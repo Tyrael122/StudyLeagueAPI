@@ -3,15 +3,14 @@ package br.studyleague.api.model.aggregabledata;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.grade.WeeklyGrade;
 import br.studyleague.api.model.aggregabledata.statistics.DailyStatisticsManager;
-import br.studyleague.api.model.util.DateRange;
 import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.api.model.util.aggregable.AggregableArrayList;
-import br.studyleague.api.model.util.aggregable.AggregableList;
+import br.studyleague.api.model.util.DateRange;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static br.studyleague.api.model.util.GradeCalculator.calculateDailyGrade;
@@ -25,14 +24,14 @@ public class StudentAggregableData {
     @GeneratedValue
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private DailyStatisticsManager statisticManager = new DailyStatisticsManager();
 
-    @OneToMany
-    private AggregableList<Grade> dailyGrades = new AggregableArrayList<>(new Grade());
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Grade> dailyGrades = new ArrayList<>();
 
-    @OneToMany
-    private AggregableList<WeeklyGrade> weeklyGrades = new AggregableArrayList<>(new WeeklyGrade());
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<WeeklyGrade> weeklyGrades = new ArrayList<>();
 
     public void syncDailyGrade(LocalDate date, StudyDay studyDay) {
         float studentDailyGrade = calculateDailyGrade(date, studyDay);

@@ -7,14 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DailyDataParser<T extends DailyAggregable<T>> {
-    private final AggregableList<T> dailyData;
+    private final List<T> dailyData;
+    private final Class<T> classType;
 
-    public static <T extends DailyAggregable<T>> DailyDataParser<T> of(AggregableList<T> dailyData) {
-        return new DailyDataParser<>(dailyData);
+    public static <T extends DailyAggregable<T>> DailyDataParser<T> of(List<T> dailyData, Class<T> classType) {
+        return new DailyDataParser<>(dailyData, classType);
     }
 
-    private DailyDataParser(AggregableList<T> dailyData) {
+    private DailyDataParser(List<T> dailyData, Class<T> classType) {
         this.dailyData = dailyData;
+        this.classType = classType;
     }
 
     public T getDailyDataOrDefault(LocalDate date) {
@@ -61,6 +63,10 @@ public class DailyDataParser<T extends DailyAggregable<T>> {
     }
 
     private T getEmptyDefaultValue() {
-        return dailyData.getDefaultValue();
+        try {
+            return classType.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create empty default value for " + classType.getName());
+        }
     }
 }

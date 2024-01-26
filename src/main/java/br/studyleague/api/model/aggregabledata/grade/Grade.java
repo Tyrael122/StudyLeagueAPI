@@ -1,6 +1,7 @@
 package br.studyleague.api.model.aggregabledata.grade;
 
 import br.studyleague.api.model.util.aggregable.DailyAggregable;
+import br.studyleague.api.model.util.aggregable.DailyDataParser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -19,6 +20,10 @@ public class Grade implements DailyAggregable<Grade> {
 
     private LocalDate date;
     private float grade = 0;
+
+    public static DailyDataParser<Grade> parse(List<Grade> dailyGrades) {
+        return DailyDataParser.of(dailyGrades, Grade.class);
+    }
 
     @Override
     public Grade addAll(List<Grade> aggregables) {

@@ -1,6 +1,7 @@
 package br.studyleague.api.model.aggregabledata.statistics;
 
 import br.studyleague.api.model.util.aggregable.DailyAggregable;
+import br.studyleague.api.model.util.aggregable.DailyDataParser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -26,6 +27,10 @@ public class Statistic implements DailyAggregable<Statistic> {
     private int hoursStudied = 0;
     private int questionsAnswered = 0;
     private int reviewsMade = 0;
+
+    public static DailyDataParser<Statistic> parse(List<Statistic> dailyStatistics) {
+        return DailyDataParser.of(dailyStatistics, Statistic.class);
+    }
 
     public float getValue(StatisticType statisticType) {
         return switch (statisticType) {

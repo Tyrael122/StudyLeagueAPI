@@ -6,13 +6,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class RangedDataParser<T extends RangedAggregable<T>> {
-    private final AggregableList<T> aggregableList;
+    private final List<T> aggregableList;
 
-    private RangedDataParser(AggregableList<T> aggregableList) {
+    private RangedDataParser(List<T> aggregableList) {
         this.aggregableList = aggregableList;
     }
 
-    public static <T extends RangedAggregable<T>> RangedDataParser<T> of(AggregableList<T> aggregableList) {
+    public static <T extends RangedAggregable<T>> RangedDataParser<T> of(List<T> aggregableList) {
         return new RangedDataParser<>(aggregableList);
     }
 
@@ -32,6 +32,10 @@ public class RangedDataParser<T extends RangedAggregable<T>> {
         List<T> dataWithinRange = aggregableList.stream()
                 .filter(d -> range.contains(d.getRange())).toList();
 
-        return aggregableList.getDefaultValue().addAll(dataWithinRange);
+        return getEmptyDefaultValue().addAll(dataWithinRange);
+    }
+
+    private T getEmptyDefaultValue() {
+        throw new RuntimeException("Empty default value not implemented");
     }
 }

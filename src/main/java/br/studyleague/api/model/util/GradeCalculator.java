@@ -24,7 +24,7 @@ public class GradeCalculator {
         }
 
         for (Subject subject : subjects.keySet()) {
-            Statistic subjectStatistic = DailyDataParser.of(subject.getDailyStatistics()).getDailyDataOrDefault(date);
+            Statistic subjectStatistic = Statistic.parse(subject.getDailyStatistics()).getDailyDataOrDefault(date);
 
             float totalHoursToDo = subjects.get(subject);
 
@@ -52,7 +52,7 @@ public class GradeCalculator {
         float reviewsDoneAverage = 0;
 
         for (Subject subject : subjects) {
-            Statistic subjectStatistics = DailyDataParser.of(subject.getDailyStatistics()).getWeeklyData(weekRange);
+            Statistic subjectStatistics = Statistic.parse(subject.getDailyStatistics()).getWeeklyData(weekRange);
 
             float hoursGrade = ceilGrade(subjectStatistics.getValue(StatisticType.HOURS), subject.getGoals().getWeeklyGoal(StatisticType.HOURS));
             float questionsGrade = ceilGrade(subjectStatistics.getValue(StatisticType.QUESTIONS), subject.getGoals().getWeeklyGoal(StatisticType.QUESTIONS));

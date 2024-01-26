@@ -1,15 +1,11 @@
 package br.studyleague.api.model.aggregabledata.statistics;
 
-import br.studyleague.api.model.util.aggregable.AggregableArrayList;
-import br.studyleague.api.model.util.aggregable.AggregableList;
-import br.studyleague.api.model.util.aggregable.DailyDataParser;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Data
@@ -20,11 +16,11 @@ public class DailyStatisticsManager {
     @GeneratedValue
     private Long id;
 
-    @OneToMany
-    private AggregableList<Statistic> rawStatistics = new AggregableArrayList<>(new Statistic());
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Statistic> rawStatistics = new ArrayList<>();
 
     public void setStatisticValue(LocalDate date, StatisticType statisticType, float value) {
-        Statistic statistic = DailyDataParser.of(rawStatistics).getDailyData(date);
+        Statistic statistic = Statistic.parse(rawStatistics).getDailyData(date);
         if (statistic == null) {
             statistic = new Statistic();
             statistic.setDate(date);
