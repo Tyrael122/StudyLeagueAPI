@@ -12,6 +12,6 @@ public class SubjectAggregableData {
     @GeneratedValue
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private DailyStatisticsManager statisticManager = new DailyStatisticsManager();
 }

@@ -3,6 +3,7 @@ package br.studyleague.api.model.aggregabledata;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.grade.WeeklyGrade;
 import br.studyleague.api.model.aggregabledata.statistics.DailyStatisticsManager;
+import br.studyleague.api.model.student.schedule.ScheduleEntry;
 import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.DateRange;
@@ -34,7 +35,7 @@ public class StudentAggregableData {
     private List<WeeklyGrade> weeklyGrades = new ArrayList<>();
 
     public void syncDailyGrade(LocalDate date, StudyDay studyDay) {
-        float studentDailyGrade = calculateDailyGrade(date, studyDay);
+        float studentDailyGrade = calculateDailyGrade(date, studyDay.getSchedule());
 
         Grade newGrade = new Grade();
         newGrade.setDate(date);

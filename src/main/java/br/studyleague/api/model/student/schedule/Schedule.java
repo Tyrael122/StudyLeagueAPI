@@ -2,15 +2,11 @@ package br.studyleague.api.model.student.schedule;
 
 import br.studyleague.api.model.aggregabledata.statistics.StatisticType;
 import br.studyleague.api.model.subject.Subject;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Entity
@@ -20,27 +16,48 @@ public class Schedule {
     @GeneratedValue
     private Long id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<StudyDay> days = new ArrayList<>();
 
-    public void addScheduleEntry(ScheduleEntry entry, DayOfWeek day) {
-        StudyDay studyDay = getStudyDay(day);
+    public void syncSubjectHourGoalsWithSchedule(List<Subject> studentSubjects) {
+        Map<Subject, Float> subjectHours = new HashMap<>();
 
-        studyDay.getSchedule().add(entry);
+        for (StudyDay studyDay : days) {
+            for (ScheduleEntry entry : studyDay.getSchedule()) {
+                syncEntryWithStudentSubject(entry, studentSubjects);
 
-        float goalValue = entry.getSubject().getGoals().getWeeklyGoal(StatisticType.HOURS);
-        entry.getSubject().getGoals().setWeeklyGoal(StatisticType.HOURS, entry.getDuration() + goalValue);
+                Subject subject = entry.getSubject();
+                float duration = entry.getDuration();
+
+                subjectHours.put(subject, subjectHours.getOrDefault(subject, 0F) + duration);
+            }
+        }
+
+        for (Subject subject : subjectHours.keySet()) {
+            subject.getGoals().setWeeklyGoal(StatisticType.HOURS, subjectHours.get(subject));
+        }
+    }
+
+    private static void syncEntryWithStudentSubject(ScheduleEntry entry, List<Subject> studentSubjects) {
+        long subjectId = entry.getSubject().getId();
+
+        Subject subject = studentSubjects.stream()
+                .filter(s -> s.getId().equals(subjectId))
+                .findFirst()
+                .orElse(null);
+
+        entry.setSubject(subject);
     }
 
     public List<Subject> getSubjects(DayOfWeek dayOfWeek) {
         StudyDay studyDay = getStudyDay(dayOfWeek);
 
-        List<Subject> subjects = new ArrayList<>();
+        Set<Subject> subjects = new HashSet<>();
         for (ScheduleEntry entry : studyDay.getSchedule()) {
             subjects.add(entry.getSubject());
         }
 
-        return subjects;
+        return subjects.stream().toList();
     }
 
     public StudyDay getStudyDay(DayOfWeek dayOfWeek) {

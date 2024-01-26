@@ -5,7 +5,6 @@ import br.studyleague.api.model.student.Student;
 import br.studyleague.api.repository.StudentRepository;
 import br.studyleague.dtos.StudentDTO;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,7 @@ public class StudentController {
         this.studentRepository = studentRepository;
     }
 
-    @PostMapping("/student")
+    @PostMapping(ENDPOINT_PREFIX)
     public ResponseEntity<Student> create(@RequestBody StudentDTO studentDto) {
         Student student = modelMapper.map(studentDto, Student.class);
 
@@ -30,7 +29,7 @@ public class StudentController {
         return ResponseEntity.ok(student);
     }
 
-    @GetMapping(ENDPOINT_PREFIX + "/{id}")
+    @GetMapping(EndpointPrefixes.STUDENT_ID)
     public ResponseEntity<Student> getById(@PathVariable Long id) {
         return ResponseEntity.ok(studentRepository.findById(id).orElseThrow());
     }

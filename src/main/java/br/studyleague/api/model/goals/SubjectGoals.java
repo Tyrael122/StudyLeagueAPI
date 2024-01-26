@@ -1,10 +1,7 @@
 package br.studyleague.api.model.goals;
 
 import br.studyleague.api.model.aggregabledata.statistics.StatisticType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -18,10 +15,10 @@ public class SubjectGoals {
     @GeneratedValue
     private Long id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Goal> weeklyGoals = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Goal> allTimeGoals = new ArrayList<>();
 
     public void setWeeklyGoal(StatisticType type, float value) {

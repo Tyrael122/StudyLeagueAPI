@@ -1,24 +1,28 @@
 package br.studyleague.api.model.util;
 
-import br.studyleague.api.model.student.schedule.ScheduleEntry;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.aggregabledata.statistics.StatisticType;
-import br.studyleague.api.model.student.schedule.StudyDay;
+import br.studyleague.api.model.student.schedule.ScheduleEntry;
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.api.model.util.aggregable.DailyDataParser;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GradeCalculator {
     private GradeCalculator() {}
 
-    public static float calculateDailyGrade(LocalDate date, StudyDay studyDay) {
+    public static float calculateDailyGrade(LocalDate date, List<ScheduleEntry> scheduleEntries) {
+        if (scheduleEntries.isEmpty()) {
+            return 0;
+        }
+
         float numberOfHoursGoalsDone = 0;
         float hoursStudiedAverage = 0;
 
         Map<Subject, Float> subjects = new HashMap<>();
-        for (ScheduleEntry entry : studyDay.getSchedule()) {
+        for (ScheduleEntry entry : scheduleEntries) {
             float previousDuration = subjects.getOrDefault(entry.getSubject(), 0F);
             subjects.put(entry.getSubject(), previousDuration + entry.getDuration());
         }
@@ -77,12 +81,16 @@ public class GradeCalculator {
         return limitFinalAverage(weeklyGrade * 10);
     }
 
-    private static float ceilGrade(float achieved, float limit) {
-        if (achieved > limit) {
+    private static float ceilGrade(float achieved, float target) {
+        if (target == 0) {
+            return 0;
+        }
+
+        if (achieved > target) {
             return 1.1F;
         }
 
-        return achieved / limit;
+        return achieved / target;
     }
 
     private static float limitFinalAverage(float average) {

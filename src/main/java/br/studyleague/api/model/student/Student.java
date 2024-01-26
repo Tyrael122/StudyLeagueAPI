@@ -1,6 +1,8 @@
 package br.studyleague.api.model.student;
 
 import br.studyleague.api.model.student.schedule.Schedule;
+import br.studyleague.api.model.student.schedule.ScheduleEntry;
+import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.util.DateRange;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.aggregabledata.StudentAggregableData;
@@ -50,7 +52,8 @@ public class Student {
     }
 
     public void syncGradesByDate(LocalDate updatedDate) {
-        aggregableData.syncDailyGrade(updatedDate, schedule.getStudyDay(updatedDate.getDayOfWeek()));
+        StudyDay studyDay = schedule.getStudyDay(updatedDate.getDayOfWeek());
+        aggregableData.syncDailyGrade(updatedDate, studyDay);
 
         DateRange weekRange = DateRange.calculateWeekRange(updatedDate);
         aggregableData.syncWeeklyGrade(weekRange, subjects);

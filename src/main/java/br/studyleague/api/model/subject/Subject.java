@@ -18,11 +18,11 @@ public class Subject {
 
     private String name;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private SubjectGoals goals = new SubjectGoals();
 
     @Delegate
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private SubjectAggregableData aggregableData = new SubjectAggregableData();
 
     public List<Statistic> getDailyStatistics() {

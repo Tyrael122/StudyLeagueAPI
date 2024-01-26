@@ -1,9 +1,6 @@
 package br.studyleague.api.model.student.schedule;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.DayOfWeek;
@@ -20,7 +17,7 @@ public class StudyDay {
 
     private DayOfWeek dayOfWeek;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<ScheduleEntry> schedule = new ArrayList<>();
 }
 
