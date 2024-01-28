@@ -1,8 +1,8 @@
 package br.studyleague.api.model.subject;
 
-import br.studyleague.api.model.goals.SubjectGoals;
-import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.aggregabledata.SubjectAggregableData;
+import br.studyleague.api.model.aggregabledata.statistics.Statistic;
+import br.studyleague.api.model.goals.SubjectGoals;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Delegate;

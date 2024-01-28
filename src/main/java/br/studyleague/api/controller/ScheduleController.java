@@ -28,7 +28,7 @@ public class ScheduleController {
     }
 
     @PutMapping(EndpointPrefixes.STUDENT + "/{id}" + ENDPOINT_PREFIX)
-    public ResponseEntity<Schedule> saveStudentSchedule(@PathVariable Long id, @RequestBody ScheduleDTO scheduleDto) {
+    public ResponseEntity<ScheduleDTO> saveStudentSchedule(@PathVariable Long id, @RequestBody ScheduleDTO scheduleDto) {
         Student student = studentRepository.findById(id).orElseThrow();
 
         Schedule schedule = getNewStudentSchedule(scheduleDto, student);
@@ -40,14 +40,14 @@ public class ScheduleController {
 //        scheduleRepository.delete(previousSchedule);
         studentRepository.save(student);
 
-        return ResponseEntity.ok(student.getSchedule());
+        return ResponseEntity.ok(mapScheduleToDto(student.getSchedule()));
     }
 
     @GetMapping(EndpointPrefixes.STUDENT + "/{id}" + ENDPOINT_PREFIX)
-    public ResponseEntity<Schedule> getStudentSchedule(@PathVariable Long id) {
+    public ResponseEntity<ScheduleDTO> getStudentSchedule(@PathVariable Long id) {
         Student student = studentRepository.findById(id).orElseThrow();
 
-        return ResponseEntity.ok(student.getSchedule());
+        return ResponseEntity.ok(mapScheduleToDto(student.getSchedule()));
     }
 
     private Schedule getNewStudentSchedule(ScheduleDTO scheduleDto, Student student) {
@@ -60,5 +60,9 @@ public class ScheduleController {
     private static void setStudentSchedule(Student student, Schedule schedule) {
         student.setSchedule(schedule);
         student.syncGradesByDate(LocalDate.now());
+    }
+
+    private ScheduleDTO mapScheduleToDto(Schedule schedule) {
+        return modelMapper.map(schedule, ScheduleDTO.class);
     }
 }

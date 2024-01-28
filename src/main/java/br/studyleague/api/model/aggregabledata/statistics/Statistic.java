@@ -3,6 +3,7 @@ package br.studyleague.api.model.aggregabledata.statistics;
 import br.studyleague.api.model.util.DateRange;
 import br.studyleague.api.model.util.aggregable.Aggregable;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
+import br.studyleague.dtos.ReadStatisticDTO;
 import br.studyleague.dtos.enums.StatisticType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.modelmapper.ModelMapper;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,6 +34,12 @@ public class Statistic implements Aggregable<Statistic> {
 
     public static RawDataParser<Statistic> parse(List<Statistic> dailyStatistics) {
         return RawDataParser.of(dailyStatistics, Statistic.class);
+    }
+
+    public static ReadStatisticDTO toReadDto(Statistic statistic) {
+        ModelMapper modelMapper = new ModelMapper();
+
+        return modelMapper.map(statistic, ReadStatisticDTO.class);
     }
 
     public float getValue(StatisticType statisticType) {

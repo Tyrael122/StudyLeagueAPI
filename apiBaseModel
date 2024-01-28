@@ -5,7 +5,8 @@ DONE:
 /student/{id} - GET - Get a student by id
 
 /student/{id}/subjects - POST - Creates a new subject for a student, or updates the existing ones.
-/student/{id}/subjects - GET - Get the subjects of a student by id
+/student/{id}/subjects?date='' - GET - Get the subjects of a student by id, all of them.
+/student/{id}/scheduled-subjects?date='' - GET - Get the subjects of a student by id, only the scheduled for the date.
 
 /student/{id}/schedule - POST - Creates a new schedule for a student, or updates the existing one.
 /student/{id}/schedule - GET - Get the schedule of a student by id
@@ -15,6 +16,3 @@ DONE:
 /student/{id}/subjects/{id}/stats - POST - Creates a new stat for a subject, or updates the existing ones.
 
 /student/{id}/stats - GET - Get the stats (raw stats, grades) of a student by id
-
-TODO:
-/student/{id}/subjects?date='' - GET - Get the subjects of a student by id, by date. (date is optional)
