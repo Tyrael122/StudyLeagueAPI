@@ -33,11 +33,8 @@ public class ScheduleController {
 
         Schedule schedule = getNewStudentSchedule(scheduleDto, student);
 
-//        Schedule previousSchedule = student.getSchedule();
-
         setStudentSchedule(student, schedule);
 
-//        scheduleRepository.delete(previousSchedule);
         studentRepository.save(student);
 
         return ResponseEntity.ok(mapScheduleToDto(student.getSchedule()));

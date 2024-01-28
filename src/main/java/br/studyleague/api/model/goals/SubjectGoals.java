@@ -32,6 +32,9 @@ public class SubjectGoals {
     public float getAllTimeGoal(StatisticType type) {
         return getGoalValue(allTimeGoals, type).getValue();
     }
+    public void setAllTimeGoal(StatisticType type, float value) {
+        getGoalValue(allTimeGoals, type).setValue(value);
+    }
 
     private Goal getGoalValue(List<Goal> goals, StatisticType type) {
         Goal matchedGoal = goals.stream()

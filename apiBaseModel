@@ -1,6 +1,5 @@
 Draft of endpoints of the API.
 
-DONE:
 /student - POST - Creates a new student
 /student/{id} - GET - Get a student by id
 
@@ -11,7 +10,7 @@ DONE:
 /student/{id}/schedule - POST - Creates a new schedule for a student, or updates the existing one.
 /student/{id}/schedule - GET - Get the schedule of a student by id
 
-/student/{id}/subjects/{id}/goals - POST - Creates a new goal for a subject, or updates the existing ones.
+/student/{id}/subjects/{id}/goals?timeframe=weekly - POST - Creates a new goal for a subject, or updates the existing ones, according to the timeframe.
 
 /student/{id}/subjects/{id}/stats - POST - Creates a new stat for a subject, or updates the existing ones.
 

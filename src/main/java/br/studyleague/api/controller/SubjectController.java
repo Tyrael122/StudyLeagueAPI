@@ -11,6 +11,7 @@ import br.studyleague.api.repository.SubjectRepository;
 import br.studyleague.dtos.GoalDTO;
 import br.studyleague.dtos.SubjectDTO;
 import br.studyleague.dtos.WriteStatisticDTO;
+import br.studyleague.dtos.enums.DateRangeType;
 import br.studyleague.dtos.enums.StatisticType;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ public class SubjectController {
     }
 
     @PostMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT_ID + EndpointPrefixes.GOALS)
-    public ResponseEntity<SubjectDTO> setSubjectGoals(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody GoalDTO goalDto) {
+    public ResponseEntity<SubjectDTO> setSubjectGoals(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody GoalDTO goalDto, @RequestParam DateRangeType dateRangeType) {
         validateGoalRequest(goalDto);
 
         Student student = studentRepository.findById(studentId).orElseThrow();
@@ -71,12 +72,22 @@ public class SubjectController {
 
         Goal goal = modelMapper.map(goalDto, Goal.class);
 
-        subject.getGoals().setWeeklyGoal(goal.getStatisticType(), goal.getValue());
+        setSubjectGoal(dateRangeType, subject, goal);
         student.syncGradesByDate(LocalDate.now());
 
         studentRepository.save(student);
 
         return ResponseEntity.ok(mapSubjectToDto(subject));
+    }
+
+    private static void setSubjectGoal(DateRangeType dateRangeType, Subject subject, Goal goal) {
+        if (dateRangeType == DateRangeType.WEEKLY) {
+            subject.getGoals().setWeeklyGoal(goal.getStatisticType(), goal.getValue());
+        } else if (dateRangeType == DateRangeType.ALL_TIME) {
+            subject.getGoals().setAllTimeGoal(goal.getStatisticType(), goal.getValue());
+        } else {
+            throw new IllegalArgumentException("Date range of type " + dateRangeType + " is not supported.");
+        }
     }
 
     @PostMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT_ID + EndpointPrefixes.STATS)
