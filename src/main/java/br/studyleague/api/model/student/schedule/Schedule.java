@@ -1,7 +1,7 @@
 package br.studyleague.api.model.student.schedule;
 
-import br.studyleague.api.model.aggregabledata.statistics.StatisticType;
 import br.studyleague.api.model.subject.Subject;
+import br.studyleague.dtos.enums.StatisticType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,6 +26,8 @@ public class Schedule {
             for (ScheduleEntry entry : studyDay.getSchedule()) {
                 syncEntryWithStudentSubject(entry, studentSubjects);
 
+                preventDatabaseConflits(entry);
+
                 Subject subject = entry.getSubject();
                 float duration = entry.getDuration();
 
@@ -38,15 +40,8 @@ public class Schedule {
         }
     }
 
-    private static void syncEntryWithStudentSubject(ScheduleEntry entry, List<Subject> studentSubjects) {
-        long subjectId = entry.getSubject().getId();
-
-        Subject subject = studentSubjects.stream()
-                .filter(s -> s.getId().equals(subjectId))
-                .findFirst()
-                .orElse(null);
-
-        entry.setSubject(subject);
+    private void preventDatabaseConflits(ScheduleEntry entry) {
+        entry.setId(null);
     }
 
     public List<Subject> getSubjects(DayOfWeek dayOfWeek) {
@@ -74,5 +69,16 @@ public class Schedule {
         }
 
         return day;
+    }
+
+    private static void syncEntryWithStudentSubject(ScheduleEntry entry, List<Subject> studentSubjects) {
+        long subjectId = entry.getSubject().getId();
+
+        Subject subject = studentSubjects.stream()
+                .filter(s -> s.getId().equals(subjectId))
+                .findFirst()
+                .orElse(null);
+
+        entry.setSubject(subject);
     }
 }

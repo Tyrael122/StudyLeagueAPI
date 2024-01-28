@@ -1,7 +1,8 @@
 package br.studyleague.api.model.aggregabledata.grade;
 
-import br.studyleague.api.model.util.aggregable.DailyAggregable;
-import br.studyleague.api.model.util.aggregable.DailyDataParser;
+import br.studyleague.api.model.util.DateRange;
+import br.studyleague.api.model.util.aggregable.Aggregable;
+import br.studyleague.api.model.util.aggregable.RawDataParser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -12,17 +13,19 @@ import java.util.List;
 
 @Data
 @Entity
-public class Grade implements DailyAggregable<Grade> {
+public class Grade implements Aggregable<Grade> {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    private LocalDate date;
+    private LocalDate startDate;
+    private LocalDate endDate;
+
     private float grade = 0;
 
-    public static DailyDataParser<Grade> parse(List<Grade> dailyGrades) {
-        return DailyDataParser.of(dailyGrades, Grade.class);
+    public static RawDataParser<Grade> parse(List<Grade> dailyGrades) {
+        return RawDataParser.of(dailyGrades, Grade.class);
     }
 
     @Override
@@ -37,5 +40,10 @@ public class Grade implements DailyAggregable<Grade> {
         dailyGrade.setGrade(sum / aggregables.size());
 
         return dailyGrade;
+    }
+
+    @Override
+    public DateRange getRange() {
+        return new DateRange(startDate, endDate);
     }
 }

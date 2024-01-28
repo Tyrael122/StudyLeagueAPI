@@ -1,12 +1,11 @@
 package br.studyleague.api.model.student;
 
-import br.studyleague.api.model.student.schedule.Schedule;
-import br.studyleague.api.model.student.schedule.ScheduleEntry;
-import br.studyleague.api.model.student.schedule.StudyDay;
-import br.studyleague.api.model.util.DateRange;
-import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.aggregabledata.StudentAggregableData;
+import br.studyleague.api.model.aggregabledata.statistics.Statistic;
+import br.studyleague.api.model.student.schedule.Schedule;
+import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
+import br.studyleague.api.model.util.DateRange;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Delegate;
@@ -57,6 +56,13 @@ public class Student {
 
         DateRange weekRange = DateRange.calculateWeekRange(updatedDate);
         aggregableData.syncWeeklyGrade(weekRange, subjects);
+    }
+
+    public Subject findSubjectById(Long subjectId) {
+        return subjects.stream()
+                .filter(subject -> subject.getId().equals(subjectId))
+                .findFirst()
+                .orElseThrow();
     }
 
     private static Statistic sumSubjectStatistics(LocalDate date, List<Subject> subjects) {

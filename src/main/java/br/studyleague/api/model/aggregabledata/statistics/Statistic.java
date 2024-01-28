@@ -1,7 +1,9 @@
 package br.studyleague.api.model.aggregabledata.statistics;
 
-import br.studyleague.api.model.util.aggregable.DailyAggregable;
-import br.studyleague.api.model.util.aggregable.DailyDataParser;
+import br.studyleague.api.model.util.DateRange;
+import br.studyleague.api.model.util.aggregable.Aggregable;
+import br.studyleague.api.model.util.aggregable.RawDataParser;
+import br.studyleague.dtos.enums.StatisticType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -14,7 +16,7 @@ import java.util.List;
 
 @Data
 @Entity
-public class Statistic implements DailyAggregable<Statistic> {
+public class Statistic implements Aggregable<Statistic> {
 
     @Id
     @Getter
@@ -24,12 +26,12 @@ public class Statistic implements DailyAggregable<Statistic> {
 
     private LocalDate date;
 
-    private int hoursStudied = 0;
+    private float hoursStudied = 0;
     private int questionsAnswered = 0;
     private int reviewsMade = 0;
 
-    public static DailyDataParser<Statistic> parse(List<Statistic> dailyStatistics) {
-        return DailyDataParser.of(dailyStatistics, Statistic.class);
+    public static RawDataParser<Statistic> parse(List<Statistic> dailyStatistics) {
+        return RawDataParser.of(dailyStatistics, Statistic.class);
     }
 
     public float getValue(StatisticType statisticType) {
@@ -43,7 +45,7 @@ public class Statistic implements DailyAggregable<Statistic> {
 
     public void setValue(StatisticType statisticType, float value) {
         switch (statisticType) {
-            case HOURS -> hoursStudied = (int) value;
+            case HOURS -> hoursStudied = value;
             case QUESTIONS -> questionsAnswered = (int) value;
             case REVIEWS -> reviewsMade = (int) value;
             default -> throw new IllegalArgumentException("Not supported statistic type");
@@ -69,5 +71,10 @@ public class Statistic implements DailyAggregable<Statistic> {
 
     private void increaseStatisticValue(StatisticType statisticType, float value) {
         setValue(statisticType, getValue(statisticType) + value);
+    }
+
+    @Override
+    public DateRange getRange() {
+        return new DateRange(date, date);
     }
 }

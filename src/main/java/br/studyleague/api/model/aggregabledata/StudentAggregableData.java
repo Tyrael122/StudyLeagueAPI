@@ -1,9 +1,7 @@
 package br.studyleague.api.model.aggregabledata;
 
 import br.studyleague.api.model.aggregabledata.grade.Grade;
-import br.studyleague.api.model.aggregabledata.grade.WeeklyGrade;
 import br.studyleague.api.model.aggregabledata.statistics.DailyStatisticsManager;
-import br.studyleague.api.model.student.schedule.ScheduleEntry;
 import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.DateRange;
@@ -32,50 +30,39 @@ public class StudentAggregableData {
     private List<Grade> dailyGrades = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<WeeklyGrade> weeklyGrades = new ArrayList<>();
+    private List<Grade> weeklyGrades = new ArrayList<>();
 
     public void syncDailyGrade(LocalDate date, StudyDay studyDay) {
         float studentDailyGrade = calculateDailyGrade(date, studyDay.getSchedule());
+        DateRange dateRange = new DateRange(date, date);
 
-        Grade newGrade = new Grade();
-        newGrade.setDate(date);
-        newGrade.setGrade(studentDailyGrade);
-
-        setGrade(date, newGrade);
+        setGrade(dailyGrades, dateRange, studentDailyGrade);
     }
 
     public void syncWeeklyGrade(DateRange weekRange, List<Subject> subjects) {
         float studentWeeklyGrade = calculateWeeklyGrade(weekRange, subjects);
 
-        WeeklyGrade newWeeklyGrade = new WeeklyGrade();
-        newWeeklyGrade.setStartDate(weekRange.startDate());
-        newWeeklyGrade.setEndDate(weekRange.endDate());
-        newWeeklyGrade.setGrade(studentWeeklyGrade);
-
-        setWeeklyGrade(weekRange, newWeeklyGrade);
+        setGrade(weeklyGrades, weekRange, studentWeeklyGrade);
     }
 
-    private void setGrade(LocalDate date, Grade newGrade) {
-        for (int i = 0; i < dailyGrades.size(); i++) {
-            Grade currentStatistic = dailyGrades.get(i);
-            if (date.equals(currentStatistic.getDate())) {
-                dailyGrades.set(i, newGrade);
+    private void setGrade(List<Grade> grades, DateRange dateRange, float newGrade) {
+        Grade newDailyGrade = new Grade();
+        newDailyGrade.setStartDate(dateRange.startDate());
+        newDailyGrade.setEndDate(dateRange.endDate());
+        newDailyGrade.setGrade(newGrade);
+
+        updateGradesList(grades, dateRange, newDailyGrade);
+    }
+
+    private void updateGradesList(List<Grade> grades, DateRange dateRange, Grade newGrade) {
+        for (int i = 0; i < grades.size(); i++) {
+            Grade currentGrade = grades.get(i);
+            if (dateRange.equals(currentGrade.getRange())) {
+                grades.set(i, newGrade);
                 return;
             }
         }
 
-        dailyGrades.add(newGrade);
-    }
-
-    private void setWeeklyGrade(DateRange dateRange, WeeklyGrade newWeeklyGrade) {
-        for (int i = 0; i < weeklyGrades.size(); i++) {
-            WeeklyGrade currentWeeklyGrade = weeklyGrades.get(i);
-            if (dateRange.equals(currentWeeklyGrade.getRange())) {
-                weeklyGrades.set(i, newWeeklyGrade);
-                return;
-            }
-        }
-
-        weeklyGrades.add(newWeeklyGrade);
+        grades.add(newGrade);
     }
 }
