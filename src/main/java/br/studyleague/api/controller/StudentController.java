@@ -4,15 +4,18 @@ import br.studyleague.api.controller.util.EndpointPrefixes;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.Student;
+import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
-import br.studyleague.dtos.StudentDTO;
-import br.studyleague.dtos.StudentStatisticsDTO;
+import br.studyleague.dtos.enums.StatisticType;
+import br.studyleague.dtos.student.StudentDTO;
+import br.studyleague.dtos.student.StudentStatisticsDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 public class StudentController {
@@ -68,11 +71,29 @@ public class StudentController {
         studentStatsDto.setWeeklyGrade(weeklyGrade);
         studentStatsDto.setMonthlyGrade(monthlyGrade);
 
+        studentStatsDto.setHoursGoalsCompleted(calculateHoursGoalsCompleted(student, date));
+
         studentStatsDto.setDailyStatistic(Statistic.toReadDto(dailyStatistic));
         studentStatsDto.setWeeklyStatistic(Statistic.toReadDto(weeklyStatistic));
         studentStatsDto.setAllTimeStatistic(Statistic.toReadDto(allTimeStatistic));
 
         return studentStatsDto;
+    }
+
+    private int calculateHoursGoalsCompleted(Student student, LocalDate date) {
+        Map<Subject, Float> subjectsToStudy = student.getSchedule().getSubjectsWithDailyHourTarget(date.getDayOfWeek());
+
+        int hoursGoalsCompleted = 0;
+        for (Subject subject : subjectsToStudy.keySet()) {
+            float hoursStudied = Statistic.parse(subject.getDailyStatistics()).getDailyDataOrDefault(date).getValue(StatisticType.HOURS);
+            float hoursGoal = subjectsToStudy.get(subject);
+
+            if (hoursStudied >= hoursGoal) {
+                hoursGoalsCompleted++;
+            }
+        }
+
+        return hoursGoalsCompleted;
     }
 
     private StudentDTO mapStudentToDto(Student student) {

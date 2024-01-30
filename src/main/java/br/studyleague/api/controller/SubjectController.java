@@ -8,9 +8,9 @@ import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
 import br.studyleague.api.repository.SubjectRepository;
-import br.studyleague.dtos.GoalDTO;
+import br.studyleague.dtos.student.goals.WriteGoalDTO;
 import br.studyleague.dtos.SubjectDTO;
-import br.studyleague.dtos.WriteStatisticDTO;
+import br.studyleague.dtos.statistic.WriteStatisticDTO;
 import br.studyleague.dtos.enums.DateRangeType;
 import br.studyleague.dtos.enums.StatisticType;
 import org.modelmapper.ModelMapper;
@@ -64,13 +64,13 @@ public class SubjectController {
     }
 
     @PostMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT_ID + EndpointPrefixes.GOALS)
-    public ResponseEntity<SubjectDTO> setSubjectGoals(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody GoalDTO goalDto, @RequestParam DateRangeType dateRangeType) {
-        validateGoalRequest(goalDto);
+    public ResponseEntity<SubjectDTO> setSubjectGoals(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody WriteGoalDTO writeGoalDto, @RequestParam DateRangeType dateRangeType) {
+        validateGoalRequest(writeGoalDto);
 
         Student student = studentRepository.findById(studentId).orElseThrow();
         Subject subject = student.findSubjectById(subjectId);
 
-        Goal goal = modelMapper.map(goalDto, Goal.class);
+        Goal goal = modelMapper.map(writeGoalDto, Goal.class);
 
         setSubjectGoal(dateRangeType, subject, goal);
         student.syncGradesByDate(LocalDate.now());
@@ -106,8 +106,8 @@ public class SubjectController {
         return ResponseEntity.ok(mapSubjectToDto(subject));
     }
 
-    private void validateGoalRequest(GoalDTO goalDto) {
-        if (goalDto.getStatisticType() == StatisticType.HOURS) {
+    private void validateGoalRequest(WriteGoalDTO writeGoalDto) {
+        if (writeGoalDto.getStatisticType() == StatisticType.HOURS) {
             throw new IllegalArgumentException("You can't set the hours goal manually, since it's calculated based on the schedule.");
         }
     }
@@ -123,10 +123,12 @@ public class SubjectController {
         List<SubjectDTO> subjectDtos = new ArrayList<>();
         for (Subject subject : subjects) {
             RawDataParser<Statistic> statisticParser = Statistic.parse(subject.getDailyStatistics());
+            Statistic dailyStatistic = statisticParser.getDailyDataOrDefault(date);
             Statistic weeklyStatistic = statisticParser.getWeeklyData(date);
             Statistic allTimeStatistic = statisticParser.getAllTimeData();
 
             SubjectDTO subjectDto = mapSubjectToDto(subject);
+            subjectDto.setDailyStatistic(Statistic.toReadDto(dailyStatistic));
             subjectDto.setWeeklyStatistic(Statistic.toReadDto(weeklyStatistic));
             subjectDto.setAllTimeStatistic(Statistic.toReadDto(allTimeStatistic));
 

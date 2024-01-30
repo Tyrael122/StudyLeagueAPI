@@ -3,7 +3,7 @@ package br.studyleague.api.model.aggregabledata.statistics;
 import br.studyleague.api.model.util.DateRange;
 import br.studyleague.api.model.util.aggregable.Aggregable;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
-import br.studyleague.dtos.ReadStatisticDTO;
+import br.studyleague.dtos.statistic.ReadStatisticDTO;
 import br.studyleague.dtos.enums.StatisticType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

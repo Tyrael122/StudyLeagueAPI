@@ -40,19 +40,22 @@ public class Schedule {
         }
     }
 
-    private void preventDatabaseConflits(ScheduleEntry entry) {
-        entry.setId(null);
+    public List<Subject> getSubjects(DayOfWeek dayOfWeek) {
+        return getSubjectsWithDailyHourTarget(dayOfWeek).keySet().stream().toList();
     }
 
-    public List<Subject> getSubjects(DayOfWeek dayOfWeek) {
+    public Map<Subject, Float> getSubjectsWithDailyHourTarget(DayOfWeek dayOfWeek) {
         StudyDay studyDay = getStudyDay(dayOfWeek);
 
-        Set<Subject> subjects = new HashSet<>();
+        Map<Subject, Float> subjects = new HashMap<>();
         for (ScheduleEntry entry : studyDay.getSchedule()) {
-            subjects.add(entry.getSubject());
+            Subject subject = entry.getSubject();
+            float duration = entry.getDuration();
+
+            subjects.put(subject, subjects.getOrDefault(subject, 0F) + duration);
         }
 
-        return subjects.stream().toList();
+        return subjects;
     }
 
     public StudyDay getStudyDay(DayOfWeek dayOfWeek) {
@@ -80,5 +83,9 @@ public class Schedule {
                 .orElse(null);
 
         entry.setSubject(subject);
+    }
+
+    private void preventDatabaseConflits(ScheduleEntry entry) {
+        entry.setId(null);
     }
 }
