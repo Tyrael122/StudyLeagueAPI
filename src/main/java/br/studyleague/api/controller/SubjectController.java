@@ -13,6 +13,7 @@ import dtos.student.goals.WriteGoalDTO;
 import enums.DateRangeType;
 import enums.StatisticType;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import util.EndpointPrefixes;
@@ -36,15 +37,19 @@ public class SubjectController {
     }
 
     @PostMapping(EndpointPrefixes.STUDENT_ID + ENDPOINT_PREFIX)
-    public ResponseEntity<SubjectDTO> create(@PathVariable Long studentId, @RequestBody SubjectDTO subjectDto) {
-        Subject subject = modelMapper.map(subjectDto, Subject.class);
+    public ResponseEntity<List<SubjectDTO>> create(@PathVariable Long studentId, @RequestBody List<SubjectDTO> subjectDtos) {
+        List<Subject> subjects = new ArrayList<>();
+        for (SubjectDTO subjectDto : subjectDtos) {
+            Subject subject = modelMapper.map(subjectDto, Subject.class);
+            subjects.add(subject);
+        }
 
         Student student = studentRepository.findById(studentId).orElseThrow();
-        student.getSubjects().add(subject);
+        student.getSubjects().addAll(subjects);
 
         studentRepository.save(student);
 
-        return ResponseEntity.ok(mapSubjectToDto(subject));
+        return ResponseEntity.ok(subjectDtos);
     }
 
     @GetMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT)
@@ -64,15 +69,20 @@ public class SubjectController {
     }
 
     @PostMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT_ID + EndpointPrefixes.GOALS)
-    public ResponseEntity<SubjectDTO> setSubjectGoals(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody WriteGoalDTO writeGoalDto, @RequestParam DateRangeType dateRangeType) {
-        validateGoalRequest(writeGoalDto);
+    public ResponseEntity<SubjectDTO> setSubjectGoals(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody List<WriteGoalDTO> writeGoalDtos, @RequestParam DateRangeType dateRangeType) {
+        for (WriteGoalDTO goalDto : writeGoalDtos) {
+            validateGoalRequest(goalDto);
+        }
 
         Student student = studentRepository.findById(studentId).orElseThrow();
         Subject subject = student.findSubjectById(subjectId);
 
-        Goal goal = modelMapper.map(writeGoalDto, Goal.class);
+        for (WriteGoalDTO writeGoalDto : writeGoalDtos) {
+            Goal goal = modelMapper.map(writeGoalDto, Goal.class);
 
-        setSubjectGoal(dateRangeType, subject, goal);
+            setSubjectGoal(dateRangeType, subject, goal);
+        }
+
         student.syncGradesByDate(LocalDate.now());
 
         studentRepository.save(student);
@@ -80,25 +90,19 @@ public class SubjectController {
         return ResponseEntity.ok(mapSubjectToDto(subject));
     }
 
-    private static void setSubjectGoal(DateRangeType dateRangeType, Subject subject, Goal goal) {
-        if (dateRangeType == DateRangeType.WEEKLY) {
-            subject.getGoals().setWeeklyGoal(goal.getStatisticType(), goal.getValue());
-        } else if (dateRangeType == DateRangeType.ALL_TIME) {
-            subject.getGoals().setAllTimeGoal(goal.getStatisticType(), goal.getValue());
-        } else {
-            throw new IllegalArgumentException("Date range of type " + dateRangeType + " is not supported.");
-        }
-    }
-
     @PostMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT_ID + EndpointPrefixes.STATS)
-    public ResponseEntity<SubjectDTO> setSubjectStats(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody WriteStatisticDTO statisticDto) {
+    public ResponseEntity<SubjectDTO> setSubjectStats(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody List<WriteStatisticDTO> statisticDtos) {
         Student student = studentRepository.findById(studentId).orElseThrow();
         Subject subject = student.findSubjectById(subjectId);
 
         validateStatisticRequest(student, subject);
 
         LocalDate currentDate = LocalDate.now();
-        subject.getStatisticManager().setStatisticValue(currentDate, statisticDto.getStatisticType(), statisticDto.getValue());
+
+        for (WriteStatisticDTO statisticDto : statisticDtos) {
+            subject.getStatisticManager().setStatisticValue(currentDate, statisticDto.getStatisticType(), statisticDto.getValue());
+        }
+
         student.syncStatisticsWithSubjects(currentDate);
 
         studentRepository.save(student);
@@ -116,6 +120,16 @@ public class SubjectController {
         List<Subject> todaySubjects = student.getSchedule().getSubjects(LocalDate.now().getDayOfWeek());
         if (!todaySubjects.contains(subject)) {
             throw new IllegalArgumentException("You can't set the statistics for a subject that isn't in the schedule for today.");
+        }
+    }
+
+    private static void setSubjectGoal(DateRangeType dateRangeType, Subject subject, Goal goal) {
+        if (dateRangeType == DateRangeType.WEEKLY) {
+            subject.getGoals().setWeeklyGoal(goal.getStatisticType(), goal.getValue());
+        } else if (dateRangeType == DateRangeType.ALL_TIME) {
+            subject.getGoals().setAllTimeGoal(goal.getStatisticType(), goal.getValue());
+        } else {
+            throw new IllegalArgumentException("Date range of type " + dateRangeType + " is not supported.");
         }
     }
 
