@@ -1,7 +1,7 @@
 package br.studyleague.api.model.student.schedule;
 
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.dtos.enums.StatisticType;
+import enums.StatisticType;
 import jakarta.persistence.*;
 import lombok.Data;
 

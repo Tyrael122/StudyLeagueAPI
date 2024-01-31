@@ -3,7 +3,7 @@ package br.studyleague.api.model.util;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.schedule.ScheduleEntry;
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.dtos.enums.StatisticType;
+import enums.StatisticType;
 
 import java.time.LocalDate;
 import java.util.HashMap;

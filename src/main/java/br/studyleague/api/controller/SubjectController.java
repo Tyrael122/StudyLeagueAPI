@@ -1,6 +1,5 @@
 package br.studyleague.api.controller;
 
-import br.studyleague.api.controller.util.EndpointPrefixes;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.goals.Goal;
 import br.studyleague.api.model.student.Student;
@@ -8,14 +7,15 @@ import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
 import br.studyleague.api.repository.SubjectRepository;
-import br.studyleague.dtos.student.goals.WriteGoalDTO;
-import br.studyleague.dtos.SubjectDTO;
-import br.studyleague.dtos.statistic.WriteStatisticDTO;
-import br.studyleague.dtos.enums.DateRangeType;
-import br.studyleague.dtos.enums.StatisticType;
+import dtos.SubjectDTO;
+import dtos.statistic.WriteStatisticDTO;
+import dtos.student.goals.WriteGoalDTO;
+import enums.DateRangeType;
+import enums.StatisticType;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import util.EndpointPrefixes;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package br.studyleague.api.model.goals;
 
-import br.studyleague.dtos.enums.StatisticType;
+import enums.StatisticType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;

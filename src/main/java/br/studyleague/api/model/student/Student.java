@@ -22,9 +22,9 @@ public class Student {
     @GeneratedValue
     private Long id;
 
-    private String name;
-    private String studyArea;
-    private String goal;
+    private String name = "";
+    private String studyArea = "";
+    private String goal = "";
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Subject> subjects = new ArrayList<>();

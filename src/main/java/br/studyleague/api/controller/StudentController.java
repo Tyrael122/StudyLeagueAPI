@@ -1,18 +1,18 @@
 package br.studyleague.api.controller;
 
-import br.studyleague.api.controller.util.EndpointPrefixes;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
-import br.studyleague.dtos.enums.StatisticType;
-import br.studyleague.dtos.student.StudentDTO;
-import br.studyleague.dtos.student.StudentStatisticsDTO;
+import dtos.student.StudentDTO;
+import dtos.student.StudentStatisticsDTO;
+import enums.StatisticType;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import util.EndpointPrefixes;
 
 import java.time.LocalDate;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package br.studyleague.api.model.aggregabledata.statistics;
 
-import br.studyleague.dtos.enums.StatisticType;
+import enums.StatisticType;
 import jakarta.persistence.*;
 import lombok.Data;
 

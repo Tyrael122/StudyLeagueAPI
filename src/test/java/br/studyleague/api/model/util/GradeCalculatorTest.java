@@ -1,7 +1,7 @@
 package br.studyleague.api.model.util;
 
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.dtos.enums.StatisticType;
+import enums.StatisticType;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
