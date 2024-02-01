@@ -27,7 +27,7 @@ public class ScheduleController {
         this.studentRepository = studentRepository;
     }
 
-    @PutMapping(EndpointPrefixes.STUDENT_ID + ENDPOINT_PREFIX)
+    @PostMapping(EndpointPrefixes.STUDENT_ID + ENDPOINT_PREFIX)
     public ResponseEntity<ScheduleDTO> saveStudentSchedule(@PathVariable Long studentId, @RequestBody ScheduleDTO scheduleDto) {
         Student student = studentRepository.findById(studentId).orElseThrow();
 
