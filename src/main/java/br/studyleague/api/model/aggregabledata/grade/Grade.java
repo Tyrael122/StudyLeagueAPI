@@ -30,16 +30,19 @@ public class Grade implements Aggregable<Grade> {
 
     @Override
     public Grade addAll(List<Grade> aggregables) {
-        Grade dailyGrade = new Grade();
+        Grade finalGrade = new Grade();
+        if (aggregables.isEmpty()) {
+            return finalGrade;
+        }
 
         float sum = 0;
         for (Grade aggregable : aggregables) {
             sum += aggregable.getGrade();
         }
 
-        dailyGrade.setGrade(sum / aggregables.size());
+        finalGrade.setGrade(sum / aggregables.size());
 
-        return dailyGrade;
+        return finalGrade;
     }
 
     @Override

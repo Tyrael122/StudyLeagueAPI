@@ -1,22 +1,33 @@
 package br.studyleague.api.model.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public record DateRange(LocalDate startDate, LocalDate endDate) {
     public static DateRange calculateWeekRange(LocalDate date) {
-        var start = date.minusDays(date.getDayOfWeek().getValue() - 1);
+        var start = getStartOfWeek(date);
         var end = start.plusDays(6);
 
         return new DateRange(start, end);
     }
 
-    public static DateRange calculateMonthRange(LocalDate currentDate) {
-        var start = currentDate.minusDays(currentDate.getDayOfMonth() - 1);
-        var end = start.plusDays(start.lengthOfMonth() - 1);
+    @NotNull
+    private static LocalDate getStartOfWeek(LocalDate date) {
+        return date.minusDays(date.getDayOfWeek().getValue() - 1);
+    }
 
-        return new DateRange(start, end);
+    public static DateRange calculateMonthRangeWithWeekOffset(LocalDate currentDate) {
+        var currentStartOfWeek = getStartOfWeek(currentDate);
+
+        var endOfMonth = currentStartOfWeek.plusDays(currentStartOfWeek.lengthOfMonth() - 1);
+
+        var startOfLastWeek = endOfMonth.minusDays(endOfMonth.getDayOfWeek().getValue() - 1);
+        var endOfLastWeek = startOfLastWeek.plusDays(6);
+
+        return new DateRange(currentStartOfWeek, endOfLastWeek);
     }
 
     public List<LocalDate> getDaysInRange() {

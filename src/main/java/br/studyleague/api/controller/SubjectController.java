@@ -2,6 +2,7 @@ package br.studyleague.api.controller;
 
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.goals.Goal;
+import br.studyleague.api.model.goals.SubjectGoals;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
@@ -9,11 +10,11 @@ import br.studyleague.api.repository.StudentRepository;
 import br.studyleague.api.repository.SubjectRepository;
 import dtos.SubjectDTO;
 import dtos.statistic.WriteStatisticDTO;
+import dtos.student.goals.ReadGoalDTO;
 import dtos.student.goals.WriteGoalDTO;
 import enums.DateRangeType;
 import enums.StatisticType;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import util.EndpointPrefixes;
@@ -53,7 +54,7 @@ public class SubjectController {
     }
 
     @GetMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT)
-    public ResponseEntity<List<SubjectDTO>> getById(@PathVariable Long studentId, @RequestParam LocalDate date) {
+    public ResponseEntity<List<SubjectDTO>> getStudentSubjects(@PathVariable Long studentId, @RequestParam LocalDate date) {
         Student student = studentRepository.findById(studentId).orElseThrow();
 
         return ResponseEntity.ok(mapSubjectsToDto(student.getSubjects(), date));
@@ -146,10 +147,45 @@ public class SubjectController {
             subjectDto.setWeeklyStatistic(Statistic.toReadDto(weeklyStatistic));
             subjectDto.setAllTimeStatistic(Statistic.toReadDto(allTimeStatistic));
 
+            subjectDto.setWeeklyGoals(mapWeeklyGoalsToDto(subject.getGoals()));
+            subjectDto.setAllTimeGoals(mapAllTimeGoalsToDto(subject.getGoals()));
+
             subjectDtos.add(subjectDto);
         }
 
         return subjectDtos;
+    }
+
+    private ReadGoalDTO mapWeeklyGoalsToDto(SubjectGoals subjectGoals) {
+        ReadGoalDTO readGoalDto = new ReadGoalDTO();
+
+        for (StatisticType statisticType : StatisticType.values()) {
+            float goalValue = subjectGoals.getWeeklyGoal(statisticType);
+
+            setStatisticTypeToGoalDto(readGoalDto, statisticType, goalValue);
+        }
+
+        return readGoalDto;
+    }
+
+    private ReadGoalDTO mapAllTimeGoalsToDto(SubjectGoals subjectGoals) {
+        ReadGoalDTO readGoalDto = new ReadGoalDTO();
+
+        for (StatisticType statisticType : StatisticType.values()) {
+            float goalValue = subjectGoals.getAllTimeGoal(statisticType);
+
+            setStatisticTypeToGoalDto(readGoalDto, statisticType, goalValue);
+        }
+
+        return readGoalDto;
+    }
+
+    private void setStatisticTypeToGoalDto(ReadGoalDTO readGoalDto, StatisticType statisticType, float goalValue) {
+        switch (statisticType) {
+            case HOURS -> readGoalDto.setHours(goalValue);
+            case QUESTIONS -> readGoalDto.setQuestions((int) goalValue);
+            case REVIEWS -> readGoalDto.setReviews((int) goalValue);
+        }
     }
 
     private SubjectDTO mapSubjectToDto(Subject subject) {
