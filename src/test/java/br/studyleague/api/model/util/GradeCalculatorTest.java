@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GradeCalculatorTest {
 
@@ -25,8 +25,19 @@ class GradeCalculatorTest {
     }
 
     @Test
+    void calculateWeeklyGradeWhenNoGoalsSet() {
+        // TODO: Assert the grade calculated is zero.
+    }
+
+    @Test
     void calculateDailyGrade() {
 
+    }
+
+    @Test
+    void calculateDailyGradesTakesIntoConsiderationOnlyNeededStats() {
+        // TODO: Assert the daily grade takes into consideration only the hours and the number of hour goals completed.
+        //  For that, calculate the goal normally, then update a stats that shouldn't be considered and ask to calculate again.
     }
 
     private List<Subject> mockSubjects() {

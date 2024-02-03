@@ -62,7 +62,7 @@ public class GradeCalculator {
             float questionsGrade = ceilGrade(subjectStatistics.getValue(StatisticType.QUESTIONS), subject.getGoals().getWeeklyGoal(StatisticType.QUESTIONS));
             float reviewsGrade = ceilGrade(subjectStatistics.getValue(StatisticType.REVIEWS), subject.getGoals().getWeeklyGoal(StatisticType.REVIEWS));
 
-            if (subjectStatistics.getValue(StatisticType.HOURS) >= subject.getGoals().getWeeklyGoal(StatisticType.HOURS)) {
+            if (hasCompletedHourGoal(subject, subjectStatistics)) {
                 numberOfHoursGoalsDone++;
             }
 
@@ -79,6 +79,13 @@ public class GradeCalculator {
 
         float weeklyGrade = (doneQuestionsAverage + hoursStudiedAverage + reviewsDoneAverage + numberOfHoursGoalsDoneAverage) / 4;
         return limitFinalAverage(weeklyGrade * 10);
+    }
+
+    private static boolean hasCompletedHourGoal(Subject subject, Statistic subjectStatistics) {
+        float weeklyHourGoal = subject.getGoals().getWeeklyGoal(StatisticType.HOURS);
+        if (weeklyHourGoal == 0) return false;
+
+        return subjectStatistics.getValue(StatisticType.HOURS) >= weeklyHourGoal;
     }
 
     private static float ceilGrade(float achieved, float target) {
