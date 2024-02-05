@@ -17,13 +17,13 @@ public class ScheduleEntry {
     @GeneratedValue
     private Long id;
 
-    private LocalTime start;
-    private LocalTime end;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     @ManyToOne // TODO: ManyToOne or OneToOne? Think about that. It should really be one to one, but for that we have to delete the previous schedule when saving.
     private Subject subject;
 
     public float getDuration() {
-        return (end.getHour() - start.getHour()) + (end.getMinute() - start.getMinute()) / 60F;
+        return (endTime.getHour() - startTime.getHour()) + (endTime.getMinute() - startTime.getMinute()) / 60F;
     }
 }
