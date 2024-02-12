@@ -17,13 +17,11 @@ public class ScheduleController {
     private final String ENDPOINT_PREFIX = EndpointPrefixes.SCHEDULE;
     private final ModelMapper modelMapper;
 
-    private final ScheduleRepository scheduleRepository;
     private final StudentRepository studentRepository;
 
-    public ScheduleController(ModelMapper modelMapper, ScheduleRepository scheduleRepository, StudentRepository studentRepository) {
+    public ScheduleController(ModelMapper modelMapper, StudentRepository studentRepository) {
         this.modelMapper = modelMapper;
 
-        this.scheduleRepository = scheduleRepository;
         this.studentRepository = studentRepository;
     }
 
