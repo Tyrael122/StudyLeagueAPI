@@ -95,8 +95,12 @@ public class SubjectController {
 
     @PostMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT_ID + EndpointPrefixes.GOALS)
     public void setSubjectGoals(@PathVariable Long studentId, @PathVariable Long subjectId, @RequestBody List<WriteGoalDTO> writeGoalDtos, @RequestParam DateRangeType dateRangeType) {
+        if (writeGoalDtos.isEmpty()) {
+            return;
+        }
+
         for (WriteGoalDTO goalDto : writeGoalDtos) {
-            validateGoalRequest(goalDto);
+            validateGoalRequest(goalDto, dateRangeType);
         }
 
         Student student = studentRepository.findById(studentId).orElseThrow();
@@ -132,9 +136,15 @@ public class SubjectController {
         studentRepository.save(student);
     }
 
-    private void validateGoalRequest(WriteGoalDTO writeGoalDto) {
+    private void validateGoalRequest(WriteGoalDTO writeGoalDto, DateRangeType dateRangeType) {
         if (writeGoalDto.getStatisticType() == StatisticType.HOURS) {
             throw new IllegalArgumentException("You can't set the hours goal manually, since it's calculated based on the schedule.");
+        }
+
+        if (dateRangeType == DateRangeType.ALL_TIME ) {
+            if (writeGoalDto.getStatisticType() == StatisticType.REVIEWS) {
+                throw new IllegalArgumentException("You can't set an all time goal for reviews.");
+            }
         }
     }
 
