@@ -33,7 +33,7 @@ public class Statistic implements Aggregable<Statistic> {
     private int reviewsMade = 0;
 
     public static RawDataParser<Statistic> parse(List<Statistic> dailyStatistics) {
-        return RawDataParser.of(dailyStatistics, Statistic.class);
+        return RawDataParser.of(dailyStatistics, new Statistic());
     }
 
     public static ReadStatisticDTO toReadDto(Statistic statistic) {

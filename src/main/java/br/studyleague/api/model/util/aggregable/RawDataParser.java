@@ -7,15 +7,15 @@ import java.util.List;
 
 public class RawDataParser<T extends Aggregable<T>> {
     private final List<T> aggregableList;
-    private final Class<T> classType;
+    private final T defaultEmptyValue;
 
-    public static <T extends Aggregable<T>> RawDataParser<T> of(List<T> dailyData, Class<T> classType) {
-        return new RawDataParser<>(dailyData, classType);
+    public static <T extends Aggregable<T>> RawDataParser<T> of(List<T> dailyData, T defaultEmptyValue) {
+        return new RawDataParser<>(dailyData, defaultEmptyValue);
     }
 
-    private RawDataParser(List<T> aggregableList, Class<T> classType) {
+    private RawDataParser(List<T> aggregableList, T defaultEmptyValue) {
         this.aggregableList = aggregableList;
-        this.classType = classType;
+        this.defaultEmptyValue = defaultEmptyValue;
     }
 
     public T getDailyDataOrDefault(LocalDate date) {
@@ -62,10 +62,6 @@ public class RawDataParser<T extends Aggregable<T>> {
     }
 
     private T getEmptyDefaultValue() {
-        try {
-            return classType.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Could not create empty default value for " + classType.getName());
-        }
+        return defaultEmptyValue;
     }
 }

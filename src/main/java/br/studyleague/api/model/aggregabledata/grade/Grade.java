@@ -25,7 +25,14 @@ public class Grade implements Aggregable<Grade> {
     private float grade = 0;
 
     public static RawDataParser<Grade> parse(List<Grade> grades) {
-        return RawDataParser.of(grades, Grade.class);
+        return RawDataParser.of(grades, new Grade());
+    }
+
+    public static float calculateMonthlyGrade(LocalDate date, RawDataParser<Grade> weeklyGradeParser) {
+        float weeklyGradesSum = weeklyGradeParser.getMonthlyData(date).getGrade();
+        int numberOfWeeks = DateRange.calculateMonthRangeWithWeekOffset(date).getWeeksInRange().size();
+
+        return weeklyGradesSum / numberOfWeeks;
     }
 
     @Override

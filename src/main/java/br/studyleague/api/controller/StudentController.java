@@ -60,9 +60,7 @@ public class StudentController {
 
         RawDataParser<Grade> weeklyGradeParser = Grade.parse(student.getWeeklyGrades());
         float weeklyGrade = weeklyGradeParser.getWeeklyData(date).getGrade();
-
-        float monthlyGradeSum = weeklyGradeParser.getMonthlyData(date).getGrade();
-        float monthlyGrade = monthlyGradeSum / DateRange.calculateMonthRangeWithWeekOffset(date).getWeeksInRange().size();
+        float monthlyGrade = Grade.calculateMonthlyGrade(date, weeklyGradeParser);
 
         RawDataParser<Statistic> statisticParser = Statistic.parse(student.getDailyStatistics());
         Statistic dailyStatistic = statisticParser.getDailyDataOrDefault(date);
@@ -81,6 +79,11 @@ public class StudentController {
         studentStatsDto.setAllTimeStatistic(Statistic.toReadDto(allTimeStatistic));
 
         return studentStatsDto;
+    }
+
+    private static float getMonthlyGrade(LocalDate date, RawDataParser<Grade> weeklyGradeParser) {
+        float monthlyGradeSum = weeklyGradeParser.getMonthlyData(date).getGrade();
+        return monthlyGradeSum / DateRange.calculateMonthRangeWithWeekOffset(date).getWeeksInRange().size();
     }
 
     private int calculateHoursGoalsCompleted(Student student, LocalDate date) {
