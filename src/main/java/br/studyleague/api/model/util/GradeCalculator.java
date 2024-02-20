@@ -11,15 +11,16 @@ import java.util.List;
 import java.util.Map;
 
 public class GradeCalculator {
-    private GradeCalculator() {}
+    private GradeCalculator() {
+    }
 
     public static float calculateDailyGrade(LocalDate date, List<ScheduleEntry> scheduleEntries) {
         if (scheduleEntries.isEmpty()) {
             return 0;
         }
 
-        float numberOfHoursGoalsDone = 0;
-        float hoursStudiedAverage = 0;
+        float hoursToStudy = 0;
+        float hoursStudied = 0;
 
         Map<Subject, Float> subjects = new HashMap<>();
         for (ScheduleEntry entry : scheduleEntries) {
@@ -30,62 +31,52 @@ public class GradeCalculator {
         for (Subject subject : subjects.keySet()) {
             Statistic subjectStatistic = Statistic.parse(subject.getDailyStatistics()).getDailyDataOrDefault(date);
 
-            float totalHoursToDo = subjects.get(subject);
+            hoursToStudy += subjects.get(subject);
 
-            float hoursGrade = ceilGrade(subjectStatistic.getValue(StatisticType.HOURS), totalHoursToDo);
-
-            if (subjectStatistic.getValue(StatisticType.HOURS) >= totalHoursToDo) {
-                numberOfHoursGoalsDone++;
-            }
-
-            hoursStudiedAverage += hoursGrade;
+            hoursStudied = subjectStatistic.getValue(StatisticType.HOURS);
         }
 
-        hoursStudiedAverage /= subjects.size();
-        float numberOfHoursGoalsDoneAverage = (numberOfHoursGoalsDone / subjects.size());
-
-        float average = (hoursStudiedAverage + numberOfHoursGoalsDoneAverage) / 2;
-        return limitFinalAverage(average * 10);
+        float hoursStudiedAverage = hoursStudied / hoursToStudy;
+        return limitFinalAverage(hoursStudiedAverage * 10);
     }
 
     public static float calculateWeeklyGrade(DateRange weekRange, List<Subject> subjects) {
-        float numberOfHoursGoalsDone = 0;
+        float hoursToStudy = 0;
+        float hoursStudied = 0;
 
-        float doneQuestionsAverage = 0;
-        float hoursStudiedAverage = 0;
-        float reviewsDoneAverage = 0;
+        float questionsGradesSum = 0;
+        float reviewsDoneGradesSum = 0;
+
+        int numberOfNonEmptyQuestionGoals = 0;
+        int numberOfNonEmptyReviewGoals = 0;
 
         for (Subject subject : subjects) {
             Statistic subjectStatistics = Statistic.parse(subject.getDailyStatistics()).getWeeklyData(weekRange);
 
-            float hoursGrade = ceilGrade(subjectStatistics.getValue(StatisticType.HOURS), subject.getGoals().getWeeklyGoal(StatisticType.HOURS));
+            hoursToStudy += subject.getGoals().getWeeklyGoal(StatisticType.HOURS);
+            hoursStudied += subjectStatistics.getValue(StatisticType.HOURS);
+
             float questionsGrade = ceilGrade(subjectStatistics.getValue(StatisticType.QUESTIONS), subject.getGoals().getWeeklyGoal(StatisticType.QUESTIONS));
             float reviewsGrade = ceilGrade(subjectStatistics.getValue(StatisticType.REVIEWS), subject.getGoals().getWeeklyGoal(StatisticType.REVIEWS));
 
-            if (hasCompletedHourGoal(subject, subjectStatistics)) {
-                numberOfHoursGoalsDone++;
+            questionsGradesSum += questionsGrade;
+            reviewsDoneGradesSum += reviewsGrade;
+
+            if (subject.getGoals().getWeeklyGoal(StatisticType.QUESTIONS) != 0) {
+                numberOfNonEmptyQuestionGoals++;
             }
 
-            doneQuestionsAverage += questionsGrade;
-            hoursStudiedAverage += hoursGrade;
-            reviewsDoneAverage += reviewsGrade;
+            if (subject.getGoals().getWeeklyGoal(StatisticType.REVIEWS) != 0) {
+                numberOfNonEmptyReviewGoals++;
+            }
         }
 
-        doneQuestionsAverage /= subjects.size();
-        hoursStudiedAverage /= subjects.size();
-        reviewsDoneAverage /= subjects.size();
+        float hoursStudiedAverage = hoursStudied / hoursToStudy;
+        float doneQuestionsAverage = questionsGradesSum / numberOfNonEmptyQuestionGoals;
+        float reviewsDoneAverage = reviewsDoneGradesSum / numberOfNonEmptyReviewGoals;
 
-        float numberOfHoursGoalsDoneAverage = (numberOfHoursGoalsDone / subjects.size());
-
-        float weeklyGrade = (doneQuestionsAverage + hoursStudiedAverage + reviewsDoneAverage + numberOfHoursGoalsDoneAverage) / 4;
+        float weeklyGrade = (doneQuestionsAverage + hoursStudiedAverage + reviewsDoneAverage) / 3;
         return limitFinalAverage(weeklyGrade * 10);
-    }
-
-    private static boolean hasCompletedHourGoal(Subject subject, Statistic subjectStatistics) {
-        float weeklyHourGoal = subject.getGoals().getWeeklyGoal(StatisticType.HOURS);
-        if (weeklyHourGoal == 0) return false;
-
-        return subjectStatistics.getValue(StatisticType.HOURS) >= weeklyHourGoal;
     }
 
     private static float ceilGrade(float achieved, float target) {
