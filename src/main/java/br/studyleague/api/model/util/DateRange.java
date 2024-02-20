@@ -40,6 +40,16 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
         return days;
     }
 
+    public List<DateRange> getWeeksInRange() {
+        List<DateRange> weeks = new ArrayList<>();
+
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(7)) {
+            weeks.add(calculateWeekRange(date));
+        }
+
+        return weeks;
+    }
+
     public boolean contains(DateRange range) {
         return !startDate.isAfter(range.startDate) && !endDate.isBefore(range.endDate);
     }

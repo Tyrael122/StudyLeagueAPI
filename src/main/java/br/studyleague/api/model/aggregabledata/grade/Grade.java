@@ -24,15 +24,15 @@ public class Grade implements Aggregable<Grade> {
 
     private float grade = 0;
 
-    public static RawDataParser<Grade> parse(List<Grade> dailyGrades) {
-        return RawDataParser.of(dailyGrades, Grade.class);
+    public static RawDataParser<Grade> parse(List<Grade> grades) {
+        return RawDataParser.of(grades, Grade.class);
     }
 
     @Override
     public Grade addAll(List<Grade> aggregables) {
-        Grade finalGrade = new Grade();
+        Grade grade = new Grade();
         if (aggregables.isEmpty()) {
-            return finalGrade;
+            return grade;
         }
 
         float sum = 0;
@@ -40,9 +40,8 @@ public class Grade implements Aggregable<Grade> {
             sum += aggregable.getGrade();
         }
 
-        finalGrade.setGrade(sum / aggregables.size());
-
-        return finalGrade;
+        grade.setGrade(sum);
+        return grade;
     }
 
     @Override

@@ -4,6 +4,7 @@ import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
+import br.studyleague.api.model.util.DateRange;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
 import dtos.student.StudentDTO;
@@ -59,7 +60,9 @@ public class StudentController {
 
         RawDataParser<Grade> weeklyGradeParser = Grade.parse(student.getWeeklyGrades());
         float weeklyGrade = weeklyGradeParser.getWeeklyData(date).getGrade();
-        float monthlyGrade = weeklyGradeParser.getMonthlyData(date).getGrade();
+
+        float monthlyGradeSum = weeklyGradeParser.getMonthlyData(date).getGrade();
+        float monthlyGrade = monthlyGradeSum / DateRange.calculateMonthRangeWithWeekOffset(date).getWeeksInRange().size();
 
         RawDataParser<Statistic> statisticParser = Statistic.parse(student.getDailyStatistics());
         Statistic dailyStatistic = statisticParser.getDailyDataOrDefault(date);
