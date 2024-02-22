@@ -33,7 +33,7 @@ public class GradeCalculator {
 
             hoursToStudy += subjects.get(subject);
 
-            hoursStudied = subjectStatistic.getValue(StatisticType.HOURS);
+            hoursStudied += subjectStatistic.getValue(StatisticType.HOURS);
         }
 
         float hoursStudiedAverage = hoursStudied / hoursToStudy;
@@ -71,21 +71,25 @@ public class GradeCalculator {
             }
         }
 
-        float hoursStudiedAverage = hoursStudied / hoursToStudy;
-        float doneQuestionsAverage = questionsGradesSum / numberOfNonEmptyQuestionGoals;
-        float reviewsDoneAverage = reviewsDoneGradesSum / numberOfNonEmptyReviewGoals;
+        float hoursStudiedAverage = ceilGrade(hoursStudied, hoursToStudy);
+        float doneQuestionsAverage = ceilGrade(questionsGradesSum, numberOfNonEmptyQuestionGoals);
+        float reviewsDoneAverage = ceilGrade(reviewsDoneGradesSum, numberOfNonEmptyReviewGoals);
 
         float weeklyGrade = (doneQuestionsAverage + hoursStudiedAverage + reviewsDoneAverage) / 3;
         return limitFinalAverage(weeklyGrade * 10);
     }
 
+    private static float ceilGradeWithBonus(float achieved, float target) {
+        if (achieved > target) {
+            return 1.1F;
+        }
+
+        return ceilGrade(achieved, target);
+    }
+
     private static float ceilGrade(float achieved, float target) {
         if (target == 0) {
             return 0;
-        }
-
-        if (achieved > target) {
-            return 1.1F;
         }
 
         return achieved / target;
