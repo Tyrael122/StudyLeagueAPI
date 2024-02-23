@@ -1,5 +1,6 @@
 package br.studyleague.api.controller;
 
+import br.studyleague.api.controller.util.datetime.DateTimeGenerator;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.goals.Goal;
 import br.studyleague.api.model.goals.SubjectGoals;
@@ -112,7 +113,7 @@ public class SubjectController {
             setSubjectGoal(dateRangeType, subject, goal);
         }
 
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = DateTimeGenerator.now();
         student.syncGradesByDate(currentDate);
 
         studentRepository.save(student);
@@ -125,7 +126,7 @@ public class SubjectController {
 
         validateStatisticRequest(student, subject);
 
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = DateTimeGenerator.now();
 
         for (WriteStatisticDTO statisticDto : statisticDtos) {
             subject.getStatisticManager().setStatisticValue(currentDate, statisticDto.getStatisticType(), statisticDto.getValue());
@@ -141,7 +142,7 @@ public class SubjectController {
             throw new IllegalArgumentException("You can't set the hours goal manually, since it's calculated based on the schedule.");
         }
 
-        if (dateRangeType == DateRangeType.ALL_TIME ) {
+        if (dateRangeType == DateRangeType.ALL_TIME) {
             if (writeGoalDto.getStatisticType() == StatisticType.REVIEWS) {
                 throw new IllegalArgumentException("You can't set an all time goal for reviews.");
             }
@@ -149,9 +150,10 @@ public class SubjectController {
     }
 
     private void validateStatisticRequest(Student student, Subject subject) {
-        List<Subject> todaySubjects = student.getSchedule().getSubjects(LocalDate.now().getDayOfWeek());
+        List<Subject> todaySubjects = student.getSchedule().getSubjects(DateTimeGenerator.now().getDayOfWeek());
         if (!todaySubjects.contains(subject)) {
-            throw new IllegalArgumentException("You can't set the statistics for a subject that isn't in the schedule for today.");
+            throw new IllegalArgumentException("You can't set the statistics for a subject that isn't in the schedule for today. " +
+                    "Trying to set statistics for subject " + subject.getName() + ".");
         }
     }
 

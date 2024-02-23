@@ -1,10 +1,9 @@
 package br.studyleague.api.model.aggregabledata;
 
+import br.studyleague.api.controller.util.datetime.DateRange;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.DailyStatisticsManager;
-import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.api.model.util.DateRange;
 import jakarta.persistence.*;
 import lombok.Data;
 

@@ -4,7 +4,6 @@ import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.api.model.util.DateRange;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
 import dtos.student.StudentDTO;
@@ -79,11 +78,6 @@ public class StudentController {
         studentStatsDto.setAllTimeStatistic(Statistic.toReadDto(allTimeStatistic));
 
         return studentStatsDto;
-    }
-
-    private static float getMonthlyGrade(LocalDate date, RawDataParser<Grade> weeklyGradeParser) {
-        float monthlyGradeSum = weeklyGradeParser.getMonthlyData(date).getGrade();
-        return monthlyGradeSum / DateRange.calculateMonthRangeWithWeekOffset(date).getWeeksInRange().size();
     }
 
     private int calculateHoursGoalsCompleted(Student student, LocalDate date) {

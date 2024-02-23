@@ -1,6 +1,6 @@
 package br.studyleague.api.model.aggregabledata.grade;
 
-import br.studyleague.api.model.util.DateRange;
+import br.studyleague.api.controller.util.datetime.DateRange;
 import br.studyleague.api.model.util.aggregable.Aggregable;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import jakarta.persistence.Entity;

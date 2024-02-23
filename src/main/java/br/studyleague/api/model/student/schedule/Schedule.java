@@ -6,7 +6,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @Entity

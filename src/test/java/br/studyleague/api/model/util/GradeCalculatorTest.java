@@ -1,5 +1,6 @@
 package br.studyleague.api.model.util;
 
+import br.studyleague.api.controller.util.datetime.DateRange;
 import br.studyleague.api.model.subject.Subject;
 import enums.StatisticType;
 import org.junit.jupiter.api.Test;

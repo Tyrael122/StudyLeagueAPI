@@ -1,16 +1,14 @@
 package br.studyleague.api.controller;
 
+import br.studyleague.api.controller.util.datetime.DateTimeGenerator;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.student.schedule.Schedule;
-import br.studyleague.api.repository.ScheduleRepository;
 import br.studyleague.api.repository.StudentRepository;
 import dtos.student.schedule.ScheduleDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import util.EndpointPrefixes;
-
-import java.time.LocalDate;
 
 @RestController
 public class ScheduleController {
@@ -54,7 +52,7 @@ public class ScheduleController {
 
     private static void setStudentSchedule(Student student, Schedule schedule) {
         student.setSchedule(schedule);
-        student.syncGradesByDate(LocalDate.now());
+        student.syncGradesByDate(DateTimeGenerator.now());
     }
 
     private ScheduleDTO mapScheduleToDto(Schedule schedule) {

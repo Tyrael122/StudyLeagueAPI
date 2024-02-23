@@ -1,6 +1,6 @@
 package br.studyleague.api.model.util.aggregable;
 
-import br.studyleague.api.model.util.DateRange;
+import br.studyleague.api.controller.util.datetime.DateRange;
 
 import java.time.LocalDate;
 import java.util.List;

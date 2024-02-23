@@ -1,6 +1,6 @@
 package br.studyleague.api.model.aggregabledata.grade;
 
-import br.studyleague.api.model.util.DateRange;
+import br.studyleague.api.controller.util.datetime.DateRange;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import org.junit.jupiter.api.Test;
 

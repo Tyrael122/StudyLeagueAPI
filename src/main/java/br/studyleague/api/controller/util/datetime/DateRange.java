@@ -1,4 +1,4 @@
-package br.studyleague.api.model.util;
+package br.studyleague.api.controller.util.datetime;
 
 import org.jetbrains.annotations.NotNull;
 
