@@ -10,14 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GradeCalculatorTest {
 
     private final LocalDate currentDate = LocalDate.now();
 
     @Test
-    void calculateWeeklyGradeWithExtraPoint() {
-        List<Subject> subjects = mockSubjects();
+    void calculateRealCaseWeeklyGrade() {
+        List<Subject> subjects = mockRealCaseSubjects();
 
         DateRange weekRange = DateRange.calculateWeekRange(currentDate);
         float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
@@ -37,7 +38,58 @@ class GradeCalculatorTest {
 
     @Test
     void calculateWeeklyGradeWhenNoGoalsSet() {
-        // TODO: Assert the grade calculated is zero.
+        List<Subject> subjects = new ArrayList<>();
+
+        subjects.add(mockSubject("Física", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)));
+        subjects.add(mockSubject("Artes", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)));
+        subjects.add(mockSubject("Direito", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)));
+
+        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
+
+        assertEquals(0, grade);
+    }
+
+    @Test
+    void calculateWeeklyGradeWithExtraPoint() {
+        List<Subject> subjects = new ArrayList<>();
+
+        subjects.add(mockSubject("Economia", List.of(3F, 100F, 100F), List.of(3F, 110F, 110F)));
+        subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 110F, 110F)));
+        subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
+
+        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
+
+        assertEquals(10, grade);
+    }
+
+    @Test
+    void weeklyGradeLimitsAmountOfExtraPoints() {
+        List<Subject> subjects = new ArrayList<>();
+
+        subjects.add(mockSubject("Economia", List.of(3F, 100F, 100F), List.of(3F, 1000F, 1000F)));
+        subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 1000F, 1000F)));
+        subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
+
+        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
+
+        assertEquals(10, grade);
+    }
+
+    @Test
+    void weeklyGradeGivesProportionalPoints() {
+        List<Subject> subjects = new ArrayList<>();
+
+        subjects.add(mockSubject("Economia", List.of(3F, 100F, 100F), List.of(3F, 105F, 105F)));
+        subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 105F, 105F)));
+        subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
+
+        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
+
+        assertTrue(grade > 9.5 && grade < 10);
     }
 
     @Test
@@ -47,8 +99,8 @@ class GradeCalculatorTest {
 
     @Test
     void calculateDailyGradesTakesIntoConsiderationOnlyNeededStats() {
-        // TODO: Assert the daily grade takes into consideration only the hours and the number of hour goals completed.
-        //  For that, calculate the goal normally, then update a stats that shouldn't be considered and ask to calculate again.
+        // TODO: Assert the daily grade takes into consideration only the hours studied.
+        //  For that, calculate the goal normally, then update a stats that shouldn't be considered and calculate again.
     }
 
     private List<Subject> mockPerfectSubjects() {
@@ -60,7 +112,7 @@ class GradeCalculatorTest {
         return subjects;
     }
 
-    private List<Subject> mockSubjects() {
+    private List<Subject> mockRealCaseSubjects() {
         List<Subject> subjects = new ArrayList<>();
 
         subjects.add(mockSubject("Direito Constitucional", List.of(3.0F, 60F, 160F), List.of(1.0F, 21F, 75F)));

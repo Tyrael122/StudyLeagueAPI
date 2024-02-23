@@ -79,20 +79,17 @@ public class GradeCalculator {
         return limitFinalAverage(weeklyGrade * 10);
     }
 
-    private static float ceilGradeWithBonus(float achieved, float target) {
-        if (achieved > target) {
-            return 1.1F;
-        }
-
-        return ceilGrade(achieved, target);
-    }
-
     private static float ceilGrade(float achieved, float target) {
         if (target == 0) {
             return 0;
         }
 
-        return achieved / target;
+        float grade = achieved / target;
+        if (grade > 1.1) {
+            return 1.1F;
+        }
+
+        return grade;
     }
 
     private static float limitFinalAverage(float average) {
