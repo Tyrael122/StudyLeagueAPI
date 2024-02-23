@@ -14,29 +14,19 @@ public class GradeCalculator {
     private GradeCalculator() {
     }
 
-    public static float calculateDailyGrade(LocalDate date, List<ScheduleEntry> scheduleEntries) {
-        if (scheduleEntries.isEmpty()) {
-            return 0;
-        }
-
+    public static float calculateDailyGrade(LocalDate date, Map<Subject, Float> subjectWithHoursToStudyToday) {
         float hoursToStudy = 0;
         float hoursStudied = 0;
 
-        Map<Subject, Float> subjects = new HashMap<>();
-        for (ScheduleEntry entry : scheduleEntries) {
-            float previousDuration = subjects.getOrDefault(entry.getSubject(), 0F);
-            subjects.put(entry.getSubject(), previousDuration + entry.getDuration());
-        }
-
-        for (Subject subject : subjects.keySet()) {
+        for (Subject subject : subjectWithHoursToStudyToday.keySet()) {
             Statistic subjectStatistic = Statistic.parse(subject.getDailyStatistics()).getDailyDataOrDefault(date);
 
-            hoursToStudy += subjects.get(subject);
+            hoursToStudy += subjectWithHoursToStudyToday.get(subject);
 
             hoursStudied += subjectStatistic.getValue(StatisticType.HOURS);
         }
 
-        float hoursStudiedAverage = hoursStudied / hoursToStudy;
+        float hoursStudiedAverage = ceilGrade(hoursStudied, hoursToStudy);
         return limitFinalAverage(hoursStudiedAverage * 10);
     }
 

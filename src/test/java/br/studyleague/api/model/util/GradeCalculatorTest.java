@@ -94,13 +94,46 @@ class GradeCalculatorTest {
 
     @Test
     void calculateDailyGrade() {
+        Map<Subject, Float> subjectWithHoursToStudyToday = Map.of(
+                mockSubject("Física", List.of(0F, 0F, 0F), List.of(1F, 0F, 0F)), 2F,
+                mockSubject("Artes", List.of(0F, 0F, 0F), List.of(1F, 0F, 0F)), 2F
+        );
 
+        float grade = GradeCalculator.calculateDailyGrade(currentDate, subjectWithHoursToStudyToday);
+        assertEquals(5, grade);
     }
 
     @Test
-    void calculateDailyGradesTakesIntoConsiderationOnlyNeededStats() {
-        // TODO: Assert the daily grade takes into consideration only the hours studied.
-        //  For that, calculate the goal normally, then update a stats that shouldn't be considered and calculate again.
+    void calculateDailyGradeWhenGoalsAreEmpty() {
+        Map<Subject, Float> subjectWithHoursToStudyToday = Map.of(
+                mockSubject("Física", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)), 0F,
+                mockSubject("Artes", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)), 0F
+        );
+
+        float grade = GradeCalculator.calculateDailyGrade(currentDate, subjectWithHoursToStudyToday);
+        assertEquals(0, grade);
+    }
+
+    @Test
+    void calculateDailyGradeWhenGoalsAreMet() {
+        Map<Subject, Float> subjectWithHoursToStudyToday = Map.of(
+                mockSubject("Física", List.of(0F, 0F, 0F), List.of(2F, 0F, 0F)), 2F,
+                mockSubject("Artes", List.of(0F, 0F, 0F), List.of(2F, 0F, 0F)), 2F
+        );
+
+        float grade = GradeCalculator.calculateDailyGrade(currentDate, subjectWithHoursToStudyToday);
+        assertEquals(10, grade);
+    }
+
+    @Test
+    void calculateDailyGradeWhenGoalsAreSurpassed() {
+        Map<Subject, Float> subjectWithHoursToStudyToday = Map.of(
+                mockSubject("Física", List.of(0F, 0F, 0F), List.of(10F, 0F, 0F)), 2F,
+                mockSubject("Artes", List.of(0F, 0F, 0F), List.of(10F, 0F, 0F)), 2F
+        );
+
+        float grade = GradeCalculator.calculateDailyGrade(currentDate, subjectWithHoursToStudyToday);
+        assertEquals(10, grade);
     }
 
     private List<Subject> mockPerfectSubjects() {
@@ -143,12 +176,14 @@ class GradeCalculatorTest {
                 StatisticType.REVIEWS, stats.get(2)
         );
 
-        return mockSubject(name, goalsMap, statsMap);
+        Subject mockedSubject = mockSubject(goalsMap, statsMap);
+        mockedSubject.setName(name);
+
+        return mockedSubject;
     }
 
-    private Subject mockSubject(String name, Map<StatisticType, Float> goals, Map<StatisticType, Float> stats) {
+    private Subject mockSubject(Map<StatisticType, Float> goals, Map<StatisticType, Float> stats) {
         Subject subject = new Subject();
-        subject.setName(name);
 
         for (Map.Entry<StatisticType, Float> entry : goals.entrySet()) {
             subject.getGoals().setWeeklyGoal(entry.getKey(), entry.getValue());

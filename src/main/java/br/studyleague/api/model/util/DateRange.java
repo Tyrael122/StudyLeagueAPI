@@ -14,11 +14,6 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
         return new DateRange(start, end);
     }
 
-    @NotNull
-    private static LocalDate getStartOfWeek(LocalDate date) {
-        return date.minusDays(date.getDayOfWeek().getValue() - 1);
-    }
-
     public static DateRange calculateMonthRangeWithWeekOffset(LocalDate currentDate) {
         var currentStartOfWeek = getStartOfWeek(currentDate);
 
@@ -52,5 +47,10 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
 
     public boolean contains(DateRange range) {
         return !startDate.isAfter(range.startDate) && !endDate.isBefore(range.endDate);
+    }
+
+    @NotNull
+    private static LocalDate getStartOfWeek(LocalDate date) {
+        return date.minusDays(date.getDayOfWeek().getValue() - 1);
     }
 }

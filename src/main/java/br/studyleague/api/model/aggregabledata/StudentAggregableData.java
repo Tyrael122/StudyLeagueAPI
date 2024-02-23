@@ -11,6 +11,7 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static br.studyleague.api.model.util.GradeCalculator.calculateDailyGrade;
 import static br.studyleague.api.model.util.GradeCalculator.calculateWeeklyGrade;
@@ -32,8 +33,8 @@ public class StudentAggregableData {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Grade> weeklyGrades = new ArrayList<>();
 
-    public void syncDailyGrade(LocalDate date, StudyDay studyDay) {
-        float studentDailyGrade = calculateDailyGrade(date, studyDay.getSchedule());
+    public void syncDailyGrade(LocalDate date, Map<Subject, Float> subjectWithHoursToStudyToday) {
+        float studentDailyGrade = calculateDailyGrade(date, subjectWithHoursToStudyToday);
         DateRange dateRange = new DateRange(date, date);
 
         setGrade(dailyGrades, dateRange, studentDailyGrade);

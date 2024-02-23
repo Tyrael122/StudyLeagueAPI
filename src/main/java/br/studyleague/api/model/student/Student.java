@@ -13,6 +13,7 @@ import lombok.experimental.Delegate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Entity
@@ -51,8 +52,8 @@ public class Student {
     }
 
     public void syncGradesByDate(LocalDate updatedDate) {
-        StudyDay studyDay = schedule.getStudyDay(updatedDate.getDayOfWeek());
-        aggregableData.syncDailyGrade(updatedDate, studyDay);
+        Map<Subject, Float> subjectWithHoursToStudyToday = schedule.getSubjectsWithDailyHourTarget(updatedDate.getDayOfWeek());
+        aggregableData.syncDailyGrade(updatedDate, subjectWithHoursToStudyToday);
 
         DateRange weekRange = DateRange.calculateWeekRange(updatedDate);
         aggregableData.syncWeeklyGrade(weekRange, subjects);
