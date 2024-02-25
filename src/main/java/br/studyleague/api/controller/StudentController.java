@@ -1,5 +1,6 @@
 package br.studyleague.api.controller;
 
+import br.studyleague.api.controller.util.datetime.DateTimeUtils;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.Student;
@@ -49,7 +50,8 @@ public class StudentController {
     public ResponseEntity<StudentStatisticsDTO> getStats(@PathVariable Long studentId, @RequestParam LocalDate date) {
         Student student = studentRepository.findById(studentId).orElseThrow();
 
-        StudentStatisticsDTO studentStatsDto = calculateStudentStatistics(student, date);
+        LocalDate offsettedDate = DateTimeUtils.studentTimezoneOffsettedDate(date);
+        StudentStatisticsDTO studentStatsDto = calculateStudentStatistics(student, offsettedDate);
 
         return ResponseEntity.ok(studentStatsDto);
     }

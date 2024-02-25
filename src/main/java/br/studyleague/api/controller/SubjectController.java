@@ -1,6 +1,6 @@
 package br.studyleague.api.controller;
 
-import br.studyleague.api.controller.util.datetime.DateTimeGenerator;
+import br.studyleague.api.controller.util.datetime.DateTimeUtils;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.goals.Goal;
 import br.studyleague.api.model.goals.SubjectGoals;
@@ -65,12 +65,14 @@ public class SubjectController {
     }
 
     @GetMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT)
-    public ResponseEntity<List<SubjectDTO>> getStudentSubjectDtos(@PathVariable Long studentId, @RequestParam LocalDate date) {
+    public ResponseEntity<List<SubjectDTO>> getAllSubjects(@PathVariable Long studentId, @RequestParam LocalDate date) {
         Student student = studentRepository.findById(studentId).orElseThrow();
+
+        LocalDate offsettedDate = DateTimeUtils.studentTimezoneOffsettedDate(date);
 
         List<SubjectDTO> subjectDtos = new ArrayList<>();
         for (Subject subject : student.getSubjects()) {
-            subjectDtos.add(mapSubjectToDto(subject, date));
+            subjectDtos.add(mapSubjectToDto(subject, offsettedDate));
         }
 
         return ResponseEntity.ok(subjectDtos);
@@ -80,11 +82,13 @@ public class SubjectController {
     public ResponseEntity<List<SubjectDTO>> getScheduledSubjects(@PathVariable Long studentId, @RequestParam LocalDate date) {
         Student student = studentRepository.findById(studentId).orElseThrow();
 
-        Map<Subject, Float> subjectsWithDailyHourTarget = student.getSchedule().getSubjectsWithDailyHourTarget(date.getDayOfWeek());
+        LocalDate offsettedDate = DateTimeUtils.studentTimezoneOffsettedDate(date);
+
+        Map<Subject, Float> subjectsWithDailyHourTarget = student.getSchedule().getSubjectsWithDailyHourTarget(offsettedDate.getDayOfWeek());
 
         List<SubjectDTO> subjectDtos = new ArrayList<>();
         for (Map.Entry<Subject, Float> entrySet : subjectsWithDailyHourTarget.entrySet()) {
-            SubjectDTO subjectDto = mapSubjectToDto(entrySet.getKey(), date);
+            SubjectDTO subjectDto = mapSubjectToDto(entrySet.getKey(), offsettedDate);
 
             subjectDto.setHoursToStudyToday(entrySet.getValue());
 
@@ -113,7 +117,7 @@ public class SubjectController {
             setSubjectGoal(dateRangeType, subject, goal);
         }
 
-        LocalDate currentDate = DateTimeGenerator.now();
+        LocalDate currentDate = DateTimeUtils.timezoneOffsettedNow();
         student.syncGradesByDate(currentDate);
 
         studentRepository.save(student);
@@ -126,7 +130,7 @@ public class SubjectController {
 
         validateStatisticRequest(student, subject);
 
-        LocalDate currentDate = DateTimeGenerator.now();
+        LocalDate currentDate = DateTimeUtils.timezoneOffsettedNow();
 
         for (WriteStatisticDTO statisticDto : statisticDtos) {
             subject.getStatisticManager().setStatisticValue(currentDate, statisticDto.getStatisticType(), statisticDto.getValue());
@@ -150,7 +154,7 @@ public class SubjectController {
     }
 
     private void validateStatisticRequest(Student student, Subject subject) {
-        List<Subject> todaySubjects = student.getSchedule().getSubjects(DateTimeGenerator.now().getDayOfWeek());
+        List<Subject> todaySubjects = student.getSchedule().getSubjects(DateTimeUtils.timezoneOffsettedNow().getDayOfWeek());
         if (!todaySubjects.contains(subject)) {
             throw new IllegalArgumentException("You can't set the statistics for a subject that isn't in the schedule for today. " +
                     "Trying to set statistics for subject " + subject.getName() + ".");

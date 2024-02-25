@@ -1,6 +1,6 @@
 package br.studyleague.api.controller;
 
-import br.studyleague.api.controller.util.datetime.DateTimeGenerator;
+import br.studyleague.api.controller.util.datetime.DateTimeUtils;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.student.schedule.Schedule;
 import br.studyleague.api.repository.StudentRepository;
@@ -52,7 +52,7 @@ public class ScheduleController {
 
     private static void setStudentSchedule(Student student, Schedule schedule) {
         student.setSchedule(schedule);
-        student.syncGradesByDate(DateTimeGenerator.now());
+        student.syncGradesByDate(DateTimeUtils.timezoneOffsettedNow());
     }
 
     private ScheduleDTO mapScheduleToDto(Schedule schedule) {
