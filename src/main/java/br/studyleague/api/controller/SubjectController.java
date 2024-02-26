@@ -117,7 +117,7 @@ public class SubjectController {
             setSubjectGoal(dateRangeType, subject, goal);
         }
 
-        LocalDate currentDate = DateTimeUtils.timezoneOffsettedNow();
+        LocalDate currentDate = DateTimeUtils.timezoneOffsettedNowDate();
         student.syncGradesByDate(currentDate);
 
         studentRepository.save(student);
@@ -130,7 +130,7 @@ public class SubjectController {
 
         validateStatisticRequest(student, subject);
 
-        LocalDate currentDate = DateTimeUtils.timezoneOffsettedNow();
+        LocalDate currentDate = DateTimeUtils.timezoneOffsettedNowDate();
 
         for (WriteStatisticDTO statisticDto : statisticDtos) {
             subject.getStatisticManager().setStatisticValue(currentDate, statisticDto.getStatisticType(), statisticDto.getValue());
@@ -154,7 +154,7 @@ public class SubjectController {
     }
 
     private void validateStatisticRequest(Student student, Subject subject) {
-        List<Subject> todaySubjects = student.getSchedule().getSubjects(DateTimeUtils.timezoneOffsettedNow().getDayOfWeek());
+        List<Subject> todaySubjects = student.getSchedule().getSubjects(DateTimeUtils.timezoneOffsettedNowDate().getDayOfWeek());
         if (!todaySubjects.contains(subject)) {
             throw new IllegalArgumentException("You can't set the statistics for a subject that isn't in the schedule for today. " +
                     "Trying to set statistics for subject " + subject.getName() + ".");

@@ -7,6 +7,7 @@ import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
+import dtos.LocalDateTimeDTO;
 import dtos.student.StudentDTO;
 import dtos.student.StudentStatisticsDTO;
 import enums.StatisticType;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import util.EndpointPrefixes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
@@ -28,6 +30,11 @@ public class StudentController {
     public StudentController(ModelMapper modelMapper, StudentRepository studentRepository) {
         this.modelMapper = modelMapper;
         this.studentRepository = studentRepository;
+    }
+
+    @GetMapping(EndpointPrefixes.CURRENT_TIME)
+    public ResponseEntity<LocalDateTime> getCurrentServerTime() {
+        return ResponseEntity.ok(DateTimeUtils.timezoneOffsettedNow());
     }
 
     @PostMapping(ENDPOINT_PREFIX)

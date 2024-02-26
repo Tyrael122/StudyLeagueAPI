@@ -52,7 +52,7 @@ public class ScheduleController {
 
     private static void setStudentSchedule(Student student, Schedule schedule) {
         student.setSchedule(schedule);
-        student.syncGradesByDate(DateTimeUtils.timezoneOffsettedNow());
+        student.syncGradesByDate(DateTimeUtils.timezoneOffsettedNowDate());
     }
 
     private ScheduleDTO mapScheduleToDto(Schedule schedule) {

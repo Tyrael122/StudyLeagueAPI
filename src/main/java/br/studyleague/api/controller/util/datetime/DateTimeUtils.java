@@ -10,8 +10,12 @@ import java.time.LocalTime;
 public class DateTimeUtils {
     private static final int STUDENT_DEFAULT_TIMEZONE_OFFSET = -3;
 
-    public static LocalDate timezoneOffsettedNow() {
+    public static LocalDate timezoneOffsettedNowDate() {
         return studentTimezoneOffsettedDate(LocalDate.now(), STUDENT_DEFAULT_TIMEZONE_OFFSET).toLocalDate();
+    }
+
+    public static LocalDateTime timezoneOffsettedNow() {
+        return studentTimezoneOffsettedDate(LocalDateTime.now(), STUDENT_DEFAULT_TIMEZONE_OFFSET);
     }
 
     public static LocalDate studentTimezoneOffsettedDate(LocalDate date) {
