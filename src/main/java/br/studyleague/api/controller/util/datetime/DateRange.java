@@ -2,27 +2,28 @@ package br.studyleague.api.controller.util.datetime;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
 public record DateRange(LocalDate startDate, LocalDate endDate) {
-    public static DateRange calculateWeekRange(LocalDate date) {
-        var start = getStartOfWeek(date);
-        var end = start.plusDays(6);
+    private static final DayOfWeek FIRST_DAY_OF_WEEK = DayOfWeek.MONDAY;
+    private static final DayOfWeek LAST_DAY_OF_WEEK = DayOfWeek.SUNDAY;
+
+    public static DateRange calculateWeeklyRange(LocalDate date) {
+        var start = calculateStartOfWeek(date);
+        var end = calculateEndOfWeek(start);
 
         return new DateRange(start, end);
     }
 
-    public static DateRange calculateMonthRangeWithWeekOffset(LocalDate currentDate) {
-        var currentStartOfWeek = getStartOfWeek(currentDate);
+    public static DateRange calculateMonthlyRangeWithWholeWeeks(LocalDate initialDate) {
+        var startOfMonth = initialDate.with(TemporalAdjusters.firstDayOfMonth());
+        var endOfMonth = initialDate.with(TemporalAdjusters.lastDayOfMonth());
 
-        var endOfMonth = currentStartOfWeek.plusDays(currentStartOfWeek.lengthOfMonth() - 1);
-
-        var startOfLastWeek = endOfMonth.minusDays(endOfMonth.getDayOfWeek().getValue() - 1);
-        var endOfLastWeek = startOfLastWeek.plusDays(6);
-
-        return new DateRange(currentStartOfWeek, endOfLastWeek);
+        return new DateRange(calculateStartOfWeek(startOfMonth), calculateEndOfWeek(endOfMonth));
     }
 
     public List<LocalDate> getDaysInRange() {
@@ -38,8 +39,12 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
     public List<DateRange> getWeeksInRange() {
         List<DateRange> weeks = new ArrayList<>();
 
-        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(7)) {
-            weeks.add(calculateWeekRange(date));
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.with(TemporalAdjusters.next(FIRST_DAY_OF_WEEK))) {
+            weeks.add(calculateWeeklyRange(date));
+
+//            var weeklyDateRange = new DateRange(date, date.with(TemporalAdjusters.next(LAST_DAY_OF_WEEK)));
+//
+//            weeks.add(weeklyDateRange);
         }
 
         return weeks;
@@ -50,7 +55,12 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
     }
 
     @NotNull
-    private static LocalDate getStartOfWeek(LocalDate date) {
-        return date.minusDays(date.getDayOfWeek().getValue() - 1);
+    private static LocalDate calculateStartOfWeek(LocalDate date) {
+        return date.with(TemporalAdjusters.previousOrSame(FIRST_DAY_OF_WEEK));
+    }
+
+    @NotNull
+    private static LocalDate calculateEndOfWeek(LocalDate date) {
+        return date.with(TemporalAdjusters.nextOrSame(LAST_DAY_OF_WEEK));
     }
 }

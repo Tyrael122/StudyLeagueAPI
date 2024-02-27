@@ -37,7 +37,7 @@ public class RawDataParser<T extends Aggregable<T>> {
     }
 
     public T getWeeklyData(LocalDate date) {
-        DateRange weekRange = DateRange.calculateWeekRange(date);
+        DateRange weekRange = DateRange.calculateWeeklyRange(date);
         return getWeeklyData(weekRange);
     }
 
@@ -46,7 +46,7 @@ public class RawDataParser<T extends Aggregable<T>> {
     }
 
     public T getMonthlyData(LocalDate currentDate) {
-        DateRange monthRange = DateRange.calculateMonthRangeWithWeekOffset(currentDate);
+        DateRange monthRange = DateRange.calculateMonthlyRangeWithWholeWeeks(currentDate);
         return sumDataWithinRange(monthRange);
     }
 

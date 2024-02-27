@@ -7,7 +7,6 @@ import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
-import dtos.LocalDateTimeDTO;
 import dtos.student.StudentDTO;
 import dtos.student.StudentStatisticsDTO;
 import enums.StatisticType;

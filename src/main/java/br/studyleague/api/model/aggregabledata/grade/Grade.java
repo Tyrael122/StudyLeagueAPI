@@ -30,7 +30,7 @@ public class Grade implements Aggregable<Grade> {
 
     public static float calculateMonthlyGrade(LocalDate date, RawDataParser<Grade> weeklyGradeParser) {
         float weeklyGradesSum = weeklyGradeParser.getMonthlyData(date).getGrade();
-        int numberOfWeeks = DateRange.calculateMonthRangeWithWeekOffset(date).getWeeksInRange().size();
+        int numberOfWeeks = DateRange.calculateMonthlyRangeWithWholeWeeks(date).getWeeksInRange().size();
 
         return weeklyGradesSum / numberOfWeeks;
     }

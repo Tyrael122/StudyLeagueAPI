@@ -63,7 +63,7 @@ class GradeTest {
     }
 
     private float calculateMonthlyGrade(LocalDate initialDate) {
-        List<DateRange> weeks = DateRange.calculateMonthRangeWithWeekOffset(initialDate).getWeeksInRange();
+        List<DateRange> weeks = DateRange.calculateMonthlyRangeWithWholeWeeks(initialDate).getWeeksInRange();
 
         List<Grade> grades = new ArrayList<>();
 

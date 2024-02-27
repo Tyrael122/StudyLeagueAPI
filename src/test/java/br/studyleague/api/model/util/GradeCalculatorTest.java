@@ -21,7 +21,7 @@ class GradeCalculatorTest {
     void calculateRealCaseWeeklyGrade() {
         List<Subject> subjects = mockRealCaseSubjects();
 
-        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
         float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
 
         assertEquals(1.54495370388031, grade);
@@ -31,7 +31,7 @@ class GradeCalculatorTest {
     void calculateMaxWeeklyGradeWithExtraPointWhenReachingAllGoals() {
         List<Subject> subjects = mockPerfectSubjects();
 
-        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
         float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
 
         assertEquals(10, grade);
@@ -45,7 +45,7 @@ class GradeCalculatorTest {
         subjects.add(mockSubject("Artes", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)));
         subjects.add(mockSubject("Direito", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)));
 
-        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
         float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
 
         assertEquals(0, grade);
@@ -59,7 +59,7 @@ class GradeCalculatorTest {
         subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 110F, 110F)));
         subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
 
-        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
         float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
 
         assertEquals(10, grade);
@@ -73,7 +73,7 @@ class GradeCalculatorTest {
         subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 1000F, 1000F)));
         subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
 
-        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
         float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
 
         assertEquals(10, grade);
@@ -87,7 +87,7 @@ class GradeCalculatorTest {
         subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 105F, 105F)));
         subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
 
-        DateRange weekRange = DateRange.calculateWeekRange(currentDate);
+        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
         float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
 
         assertTrue(grade > 9.5 && grade < 10);

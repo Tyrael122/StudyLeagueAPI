@@ -54,7 +54,7 @@ public class Student {
         Map<Subject, Float> subjectWithHoursToStudyToday = schedule.getSubjectsWithDailyHourTarget(updatedDate.getDayOfWeek());
         aggregableData.syncDailyGrade(updatedDate, subjectWithHoursToStudyToday);
 
-        DateRange weekRange = DateRange.calculateWeekRange(updatedDate);
+        DateRange weekRange = DateRange.calculateWeeklyRange(updatedDate);
         aggregableData.syncWeeklyGrade(weekRange, subjects);
     }
 
