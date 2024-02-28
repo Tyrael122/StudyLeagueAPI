@@ -19,11 +19,12 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
         return new DateRange(start, end);
     }
 
-    public static DateRange calculateMonthlyRangeWithWholeWeeks(LocalDate initialDate) {
-        var startOfMonth = initialDate.with(TemporalAdjusters.firstDayOfMonth());
-        var endOfMonth = initialDate.with(TemporalAdjusters.lastDayOfMonth());
+    public static DateRange calculateMonthlyRangeWithWholeWeeks(LocalDate date) {
+        var initialDate = calculateStartDateForMonthlyRange(date);
 
-        return new DateRange(calculateStartOfWeek(startOfMonth), calculateEndOfWeek(endOfMonth));
+        var endOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+
+        return new DateRange(initialDate, calculateEndOfWeek(endOfMonth));
     }
 
     public List<LocalDate> getDaysInRange() {
@@ -41,10 +42,6 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
 
         for (LocalDate date = startDate; date.isBefore(endDate); date = date.with(TemporalAdjusters.next(FIRST_DAY_OF_WEEK))) {
             weeks.add(calculateWeeklyRange(date));
-
-//            var weeklyDateRange = new DateRange(date, date.with(TemporalAdjusters.next(LAST_DAY_OF_WEEK)));
-//
-//            weeks.add(weeklyDateRange);
         }
 
         return weeks;
@@ -62,5 +59,17 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
     @NotNull
     private static LocalDate calculateEndOfWeek(LocalDate date) {
         return date.with(TemporalAdjusters.nextOrSame(LAST_DAY_OF_WEEK));
+    }
+
+    @NotNull
+    private static LocalDate calculateStartDateForMonthlyRange(LocalDate date) {
+        var startOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+        var initialDate = calculateStartOfWeek(startOfMonth);
+
+        if (initialDate.isBefore(startOfMonth)) {
+            initialDate = calculateEndOfWeek(startOfMonth).plusDays(1);
+        }
+
+        return initialDate;
     }
 }

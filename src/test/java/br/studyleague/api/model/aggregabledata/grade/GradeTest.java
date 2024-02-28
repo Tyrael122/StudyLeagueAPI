@@ -16,11 +16,11 @@ class GradeTest {
 
     @Test
     void calculateMonthlyGrade() {
-        weeklyGrades = List.of(10F, 8F, 9F, 7F, 5F);
+        weeklyGrades = List.of(4.3F, 8F, 9F, 7.7F);
 
         float monthlyGrade = calculateMonthlyGrade(defaultInitialDefault);
 
-        assertEquals(7.8, monthlyGrade, 0.0001);
+        assertEquals(7.25, monthlyGrade, 0.0001);
     }
 
     @Test
@@ -39,7 +39,7 @@ class GradeTest {
         LocalDate initialDate = LocalDate.of(2024, 2, 1);
         float monthlyGrade = calculateMonthlyGrade(initialDate);
 
-        assertEquals(1.6, monthlyGrade, 0.0001);
+        assertEquals(2, monthlyGrade, 0.0001);
     }
 
     @Test
@@ -54,12 +54,12 @@ class GradeTest {
 
     @Test
     void calculateMonthlyGradeWithNegativeGrades() {
-        weeklyGrades = List.of(10F, -8F, 9F, 7F, 5F);
+        weeklyGrades = List.of(10F, -8F, 9F, -7F);
 
         LocalDate initialDate = LocalDate.of(2024, 2, 1);
         float monthlyGrade = calculateMonthlyGrade(initialDate);
 
-        assertEquals(4.6, monthlyGrade, 0.0001);
+        assertEquals(1, monthlyGrade, 0.0001);
     }
 
     private float calculateMonthlyGrade(LocalDate initialDate) {
