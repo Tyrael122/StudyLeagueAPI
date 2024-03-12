@@ -22,18 +22,18 @@ public class SubjectGoals {
     private List<Goal> allTimeGoals = new ArrayList<>();
 
     public void setWeeklyGoal(StatisticType type, float value) {
-        getGoalValue(weeklyGoals, type).setValue(value);
+        getGoalValue(weeklyGoals, type).setTarget(value);
     }
 
     public float getWeeklyGoal(StatisticType type) {
-        return getGoalValue(weeklyGoals, type).getValue();
+        return getGoalValue(weeklyGoals, type).getTarget();
     }
 
     public float getAllTimeGoal(StatisticType type) {
-        return getGoalValue(allTimeGoals, type).getValue();
+        return getGoalValue(allTimeGoals, type).getTarget();
     }
     public void setAllTimeGoal(StatisticType type, float value) {
-        getGoalValue(allTimeGoals, type).setValue(value);
+        getGoalValue(allTimeGoals, type).setTarget(value);
     }
 
     private Goal getGoalValue(List<Goal> goals, StatisticType type) {

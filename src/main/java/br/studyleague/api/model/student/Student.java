@@ -1,6 +1,7 @@
 package br.studyleague.api.model.student;
 
 import br.studyleague.api.controller.util.datetime.DateRange;
+import br.studyleague.api.model.Credential;
 import br.studyleague.api.model.aggregabledata.StudentAggregableData;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.schedule.Schedule;
@@ -21,6 +22,9 @@ public class Student {
     @Id
     @GeneratedValue
     private Long id;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Credential credential;
 
     private String name = "";
     private String studyArea = "";

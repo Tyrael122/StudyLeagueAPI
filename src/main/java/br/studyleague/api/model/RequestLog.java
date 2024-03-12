@@ -33,7 +33,11 @@ public class RequestLog {
                 return;
             }
 
-            this.studentId = Long.parseLong(pathParts[2]);
+            try {
+                this.studentId = Long.parseLong(pathParts[2]);
+            } catch (NumberFormatException e) {
+                this.studentId = 0;
+            }
         }
     }
 }

@@ -1,23 +1,30 @@
 package br.studyleague.api.controller;
 
 import br.studyleague.api.controller.util.datetime.DateTimeUtils;
+import br.studyleague.api.model.Credential;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
+import dtos.signin.CredentialDTO;
+import dtos.signin.SignUpStudentData;
 import dtos.student.StudentDTO;
 import dtos.student.StudentStatisticsDTO;
 import enums.StatisticType;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import util.EndpointPrefixes;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class StudentController {
@@ -31,14 +38,31 @@ public class StudentController {
         this.studentRepository = studentRepository;
     }
 
-    @GetMapping(EndpointPrefixes.CURRENT_TIME)
-    public ResponseEntity<LocalDateTime> getCurrentServerTime() {
-        return ResponseEntity.ok(DateTimeUtils.timezoneOffsettedNow());
+    @PostMapping(EndpointPrefixes.LOGIN)
+    public ResponseEntity<StudentDTO> login(@RequestBody CredentialDTO credentialDto) {
+        Student student = studentRepository.findByCredential_Email(credentialDto.getEmail()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas!")
+        );
+
+        boolean isPasswordValid = new BCryptPasswordEncoder().matches(credentialDto.getPassword(), student.getCredential().getPassword());
+        if (!isPasswordValid) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas!");
+        }
+
+        return ResponseEntity.ok(mapStudentToDto(student));
     }
 
     @PostMapping(ENDPOINT_PREFIX)
-    public ResponseEntity<StudentDTO> create(@RequestBody StudentDTO studentDto) {
-        Student student = modelMapper.map(studentDto, Student.class);
+    public ResponseEntity<StudentDTO> create(@RequestBody SignUpStudentData signUpData) {
+        Student student = modelMapper.map(signUpData.getStudent(), Student.class);
+        Credential credential = encryptCredentialPassword(signUpData.getCredential());
+
+        Optional<Student> matchedStudent = studentRepository.findByCredential_Email(credential.getEmail());
+        if (matchedStudent.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado!");
+        }
+
+        student.setCredential(credential);
 
         studentRepository.save(student);
 
@@ -60,6 +84,17 @@ public class StudentController {
         StudentStatisticsDTO studentStatsDto = calculateStudentStatistics(student, offsettedDate);
 
         return ResponseEntity.ok(studentStatsDto);
+    }
+
+    @NotNull
+    private Credential encryptCredentialPassword(CredentialDTO credentialDto) {
+        Credential credential = modelMapper.map(credentialDto, Credential.class);
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(credential.getPassword());
+
+        credential.setPassword(encryptedPassword);
+
+        return credential;
     }
 
     private StudentStatisticsDTO calculateStudentStatistics(Student student, LocalDate date) {
@@ -105,6 +140,11 @@ public class StudentController {
     }
 
     private StudentDTO mapStudentToDto(Student student) {
-        return modelMapper.map(student, StudentDTO.class);
+        StudentDTO studentDto = modelMapper.map(student, StudentDTO.class);
+
+        String email = student.getCredential().getEmail();
+        studentDto.setEmail(email);
+
+        return studentDto;
     }
 }

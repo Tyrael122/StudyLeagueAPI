@@ -163,8 +163,8 @@ public class SubjectController {
 
     private static void setSubjectGoal(DateRangeType dateRangeType, Subject subject, Goal goal) {
         switch (dateRangeType) {
-            case WEEKLY -> subject.getGoals().setWeeklyGoal(goal.getStatisticType(), goal.getValue());
-            case ALL_TIME -> subject.getGoals().setAllTimeGoal(goal.getStatisticType(), goal.getValue());
+            case WEEKLY -> subject.getGoals().setWeeklyGoal(goal.getStatisticType(), goal.getTarget());
+            case ALL_TIME -> subject.getGoals().setAllTimeGoal(goal.getStatisticType(), goal.getTarget());
             case null, default ->
                     throw new IllegalArgumentException("Date range of type " + dateRangeType + " is not supported.");
         }
