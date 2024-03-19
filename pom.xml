@@ -13,9 +13,11 @@
 	<version>1.0</version>
 	<name>StudyLeagueAPI</name>
 	<description>Study League&apos;s Spring Boot API</description>
+
 	<properties>
 		<java.version>21</java.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

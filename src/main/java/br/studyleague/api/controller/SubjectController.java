@@ -8,6 +8,7 @@ import br.studyleague.api.model.student.Student;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
+import br.studyleague.api.repository.SubjectRepository;
 import dtos.SubjectDTO;
 import dtos.statistic.WriteStatisticDTO;
 import dtos.student.goals.ReadGoalDTO;
@@ -29,11 +30,13 @@ import java.util.Map;
 public class SubjectController {
     private final String ENDPOINT_PREFIX = EndpointPrefixes.SUBJECT;
     private final StudentRepository studentRepository;
+    private final SubjectRepository subjectRepository;
     private final ModelMapper modelMapper;
 
-    public SubjectController(StudentRepository studentRepository, ModelMapper modelMapper) {
+    public SubjectController(StudentRepository studentRepository, SubjectRepository subjectRepository, ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
 
+        this.subjectRepository = subjectRepository;
         this.studentRepository = studentRepository;
     }
 
@@ -54,14 +57,17 @@ public class SubjectController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(EndpointPrefixes.STUDENT_ID + ENDPOINT_PREFIX)
     public void deleteSubjects(@PathVariable Long studentId, @RequestBody List<SubjectDTO> subjectDtos) {
-        Student student = studentRepository.findById(studentId).orElseThrow();
-
-        for (SubjectDTO subjectDto : subjectDtos) {
-            Subject subject = student.findSubjectById(subjectDto.getId());
-            student.getSubjects().remove(subject);
-        }
-
-        studentRepository.save(student);
+        // TODO: Implement deleting stuff the subject relates to.
+//        Student student = studentRepository.findById(studentId).orElseThrow();
+//
+//        for (SubjectDTO subjectDto : subjectDtos) {
+//            Subject subject = student.findSubjectById(subjectDto.getId());
+//
+//            student.getSubjects().remove(subject);
+//            subjectRepository.delete(subject);
+//        }
+//
+//        studentRepository.save(student);
     }
 
     @GetMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT)

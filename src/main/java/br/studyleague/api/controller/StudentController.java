@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import util.EndpointPrefixes;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,9 +41,8 @@ public class StudentController {
 
     @PostMapping(EndpointPrefixes.LOGIN)
     public ResponseEntity<StudentDTO> login(@RequestBody CredentialDTO credentialDto) {
-        Student student = studentRepository.findByCredential_Email(credentialDto.getEmail()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas!")
-        );
+        Student student = studentRepository.findByCredential_Email(credentialDto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas!"));
 
         boolean isPasswordValid = new BCryptPasswordEncoder().matches(credentialDto.getPassword(), student.getCredential().getPassword());
         if (!isPasswordValid) {
