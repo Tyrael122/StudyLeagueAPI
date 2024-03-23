@@ -26,7 +26,7 @@ public class Schedule {
         Map<Subject, Float> subjectHours = new HashMap<>();
 
         for (StudyDay studyDay : days) {
-            for (ScheduleEntry entry : studyDay.getSchedule()) {
+            for (ScheduleEntry entry : studyDay.getEntries()) {
                 syncEntryWithStudentSubject(entry, studentSubjects);
 
                 preventDatabaseConflits(entry);
@@ -51,7 +51,7 @@ public class Schedule {
         StudyDay studyDay = getStudyDay(dayOfWeek);
 
         Map<Subject, Float> subjects = new HashMap<>();
-        for (ScheduleEntry entry : studyDay.getSchedule()) {
+        for (ScheduleEntry entry : studyDay.getEntries()) {
             Subject subject = entry.getSubject();
             float duration = entry.getDuration();
 

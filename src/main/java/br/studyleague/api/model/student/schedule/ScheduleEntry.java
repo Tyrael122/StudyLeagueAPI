@@ -20,7 +20,10 @@ public class ScheduleEntry {
     private LocalTime startTime;
     private LocalTime endTime;
 
-    @ManyToOne // TODO: ManyToOne or OneToOne? Think about that. It should really be one to one, but for that we have to delete the previous schedule when saving.
+    // TODO: ManyToOne or OneToOne? Think about that.
+    //  It should really be one to one, but for that we have to delete the previous schedule when saving.
+    //  That is already being done, but will it give rise to problems when trying to implement some sort of history?
+    @ManyToOne
     private Subject subject;
 
     public float getDuration() {

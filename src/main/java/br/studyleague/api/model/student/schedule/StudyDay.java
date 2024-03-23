@@ -18,6 +18,6 @@ public class StudyDay {
     private DayOfWeek dayOfWeek;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<ScheduleEntry> schedule = new ArrayList<>();
+    private List<ScheduleEntry> entries = new ArrayList<>();
 }
 

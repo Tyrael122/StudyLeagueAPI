@@ -5,6 +5,7 @@ import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.goals.Goal;
 import br.studyleague.api.model.goals.SubjectGoals;
 import br.studyleague.api.model.student.Student;
+import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
@@ -57,17 +58,21 @@ public class SubjectController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(EndpointPrefixes.STUDENT_ID + ENDPOINT_PREFIX)
     public void deleteSubjects(@PathVariable Long studentId, @RequestBody List<SubjectDTO> subjectDtos) {
-        // TODO: Implement deleting stuff the subject relates to.
 //        Student student = studentRepository.findById(studentId).orElseThrow();
 //
 //        for (SubjectDTO subjectDto : subjectDtos) {
 //            Subject subject = student.findSubjectById(subjectDto.getId());
 //
 //            student.getSubjects().remove(subject);
+//
+//            for (StudyDay studyDay : student.getSchedule().getDays()) {
+//                studyDay.getEntries().removeIf(entry -> entry.getSubject().equals(subject));
+//            }
+//
+//            studentRepository.save(student);
+//
 //            subjectRepository.delete(subject);
 //        }
-//
-//        studentRepository.save(student);
     }
 
     @GetMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.SUBJECT)
