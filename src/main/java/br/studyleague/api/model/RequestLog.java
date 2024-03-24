@@ -23,6 +23,8 @@ public class RequestLog {
 
     private LocalDateTime timestamp;
 
+    private String exception;
+
     public void setPath(String path) {
         this.path = path;
 
