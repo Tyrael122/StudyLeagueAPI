@@ -144,7 +144,7 @@ public class SubjectController {
         LocalDate currentDate = DateTimeUtils.timezoneOffsettedNowDate();
 
         for (WriteStatisticDTO statisticDto : statisticDtos) {
-            subject.getStatisticManager().setStatisticValue(currentDate, statisticDto.getStatisticType(), statisticDto.getValue());
+            subject.getAggregableData().getStatisticManager().setStatisticValue(currentDate, statisticDto.getStatisticType(), statisticDto.getValue());
         }
 
         student.syncStatisticsWithSubjects(currentDate);

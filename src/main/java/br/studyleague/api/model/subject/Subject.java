@@ -21,7 +21,6 @@ public class Subject {
     @OneToOne(cascade = CascadeType.ALL)
     private SubjectGoals goals = new SubjectGoals();
 
-    @Delegate
     @OneToOne(cascade = CascadeType.ALL)
     private SubjectAggregableData aggregableData = new SubjectAggregableData();
 

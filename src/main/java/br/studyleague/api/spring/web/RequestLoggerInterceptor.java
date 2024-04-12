@@ -4,7 +4,6 @@ import br.studyleague.api.model.RequestLog;
 import br.studyleague.api.repository.RequestLogRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -52,7 +51,6 @@ public class RequestLoggerInterceptor implements HandlerInterceptor {
         requestLogRepository.save(loggingRequestLog);
     }
 
-    @NotNull
     private static String getExceptionMessage(Exception ex) {
         StringBuilder exceptionMessage = new StringBuilder();
         if (ex != null) {

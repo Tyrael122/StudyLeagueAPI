@@ -13,7 +13,6 @@ import dtos.signin.SignUpStudentData;
 import dtos.student.StudentDTO;
 import dtos.student.StudentStatisticsDTO;
 import enums.StatisticType;
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 import util.EndpointPrefixes;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -86,7 +84,6 @@ public class StudentController {
         return ResponseEntity.ok(studentStatsDto);
     }
 
-    @NotNull
     private Credential encryptCredentialPassword(CredentialDTO credentialDto) {
         Credential credential = modelMapper.map(credentialDto, Credential.class);
 

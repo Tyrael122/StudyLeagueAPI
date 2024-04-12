@@ -191,7 +191,7 @@ class GradeCalculatorTest {
         }
 
         for (Map.Entry<StatisticType, Float> entry : stats.entrySet()) {
-            subject.getStatisticManager().setStatisticValue(currentDate, entry.getKey(), entry.getValue());
+            subject.getAggregableData().getStatisticManager().setStatisticValue(currentDate, entry.getKey(), entry.getValue());
         }
 
         return subject;

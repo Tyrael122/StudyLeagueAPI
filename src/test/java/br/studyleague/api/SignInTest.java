@@ -4,7 +4,6 @@ import br.studyleague.api.controller.StudentController;
 import dtos.signin.CredentialDTO;
 import dtos.signin.SignUpStudentData;
 import dtos.student.StudentDTO;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -90,7 +89,6 @@ public class SignInTest {
         assertEquals(studentDto.getStudyArea(), createdStudent.getStudyArea());
     }
 
-    @NotNull
     private static SignUpStudentData createSignUpStudentData(CredentialDTO credentialDto, StudentDTO studentDto) {
         SignUpStudentData signUpStudent = new SignUpStudentData();
 

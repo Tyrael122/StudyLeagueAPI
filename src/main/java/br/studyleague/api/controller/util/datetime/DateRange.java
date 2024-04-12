@@ -1,7 +1,5 @@
 package br.studyleague.api.controller.util.datetime;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -51,17 +49,14 @@ public record DateRange(LocalDate startDate, LocalDate endDate) {
         return !startDate.isAfter(range.startDate) && !endDate.isBefore(range.endDate);
     }
 
-    @NotNull
     private static LocalDate calculateStartOfWeek(LocalDate date) {
         return date.with(TemporalAdjusters.previousOrSame(FIRST_DAY_OF_WEEK));
     }
 
-    @NotNull
     private static LocalDate calculateEndOfWeek(LocalDate date) {
         return date.with(TemporalAdjusters.nextOrSame(LAST_DAY_OF_WEEK));
     }
 
-    @NotNull
     private static LocalDate calculateStartDateForMonthlyRange(LocalDate date) {
         var startOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
         var initialDate = calculateStartOfWeek(startOfMonth);
