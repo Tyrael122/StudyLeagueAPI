@@ -1,22 +1,16 @@
 package br.studyleague.api.controller;
 
 import br.studyleague.api.controller.util.datetime.DateTimeUtils;
-import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.goals.Goal;
-import br.studyleague.api.model.goals.SubjectGoals;
 import br.studyleague.api.model.student.Student;
-import br.studyleague.api.model.student.schedule.StudyDay;
 import br.studyleague.api.model.subject.Subject;
-import br.studyleague.api.model.util.aggregable.RawDataParser;
+import br.studyleague.api.model.util.Mapper;
 import br.studyleague.api.repository.StudentRepository;
-import br.studyleague.api.repository.SubjectRepository;
 import dtos.SubjectDTO;
-import dtos.statistic.WriteStatisticDTO;
-import dtos.student.goals.ReadGoalDTO;
-import dtos.student.goals.WriteGoalDTO;
+import dtos.student.WriteGoalDTO;
+import dtos.student.WriteStatisticDTO;
 import enums.DateRangeType;
 import enums.StatisticType;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,13 +25,8 @@ import java.util.Map;
 public class SubjectController {
     private final String ENDPOINT_PREFIX = EndpointPrefixes.SUBJECT;
     private final StudentRepository studentRepository;
-    private final SubjectRepository subjectRepository;
-    private final ModelMapper modelMapper;
 
-    public SubjectController(StudentRepository studentRepository, SubjectRepository subjectRepository, ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-
-        this.subjectRepository = subjectRepository;
+    public SubjectController(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
 
@@ -45,7 +34,7 @@ public class SubjectController {
     public void create(@PathVariable Long studentId, @RequestBody List<SubjectDTO> subjectDtos) {
         List<Subject> subjects = new ArrayList<>();
         for (SubjectDTO subjectDto : subjectDtos) {
-            Subject subject = modelMapper.map(subjectDto, Subject.class);
+            Subject subject = Mapper.subjectFromDTO(subjectDto);
             subjects.add(subject);
         }
 
@@ -83,7 +72,7 @@ public class SubjectController {
 
         List<SubjectDTO> subjectDtos = new ArrayList<>();
         for (Subject subject : student.getSubjects()) {
-            subjectDtos.add(mapSubjectToDto(subject, offsettedDate));
+            subjectDtos.add(Mapper.subjectToDTO(subject, offsettedDate));
         }
 
         return ResponseEntity.ok(subjectDtos);
@@ -99,7 +88,7 @@ public class SubjectController {
 
         List<SubjectDTO> subjectDtos = new ArrayList<>();
         for (Map.Entry<Subject, Float> entrySet : subjectsWithDailyHourTarget.entrySet()) {
-            SubjectDTO subjectDto = mapSubjectToDto(entrySet.getKey(), offsettedDate);
+            SubjectDTO subjectDto = Mapper.subjectToDTO(entrySet.getKey(), offsettedDate);
 
             subjectDto.setHoursToStudyToday(entrySet.getValue());
 
@@ -123,13 +112,12 @@ public class SubjectController {
         Subject subject = student.findSubjectById(subjectId);
 
         for (WriteGoalDTO writeGoalDto : writeGoalDtos) {
-            Goal goal = modelMapper.map(writeGoalDto, Goal.class);
+            Goal goal = Mapper.goalFromDto(writeGoalDto);
 
             setSubjectGoal(dateRangeType, subject, goal);
         }
 
-        LocalDate currentDate = DateTimeUtils.timezoneOffsettedNowDate();
-        student.syncGradesByDate(currentDate);
+        student.syncGrades();
 
         studentRepository.save(student);
     }
@@ -157,15 +145,13 @@ public class SubjectController {
             throw new IllegalArgumentException("You can't set the hours goal manually, since it's calculated based on the schedule.");
         }
 
-        if (dateRangeType == DateRangeType.ALL_TIME) {
-            if (writeGoalDto.getStatisticType() == StatisticType.REVIEWS) {
-                throw new IllegalArgumentException("You can't set an all time goal for reviews.");
-            }
+        if (dateRangeType == DateRangeType.ALL_TIME && writeGoalDto.getStatisticType() == StatisticType.REVIEWS) {
+            throw new IllegalArgumentException("You can't set an all time goal for reviews.");
         }
     }
 
     private void validateStatisticRequest(Student student, Subject subject) {
-        List<Subject> todaySubjects = student.getSchedule().getSubjects(DateTimeUtils.timezoneOffsettedNowDate().getDayOfWeek());
+        List<Subject> todaySubjects = student.getStudySchedulingMethod().getSubjects(DateTimeUtils.timezoneOffsettedNowDate().getDayOfWeek());
         if (!todaySubjects.contains(subject)) {
             throw new IllegalArgumentException("You can't set the statistics for a subject that isn't in the schedule for today. " +
                     "Trying to set statistics for subject " + subject.getName() + ".");
@@ -178,55 +164,6 @@ public class SubjectController {
             case ALL_TIME -> subject.getGoals().setAllTimeGoal(goal.getStatisticType(), goal.getTarget());
             case null, default ->
                     throw new IllegalArgumentException("Date range of type " + dateRangeType + " is not supported.");
-        }
-    }
-
-    private SubjectDTO mapSubjectToDto(Subject subject, LocalDate date) {
-        RawDataParser<Statistic> statisticParser = Statistic.parse(subject.getDailyStatistics());
-        Statistic dailyStatistic = statisticParser.getDailyDataOrDefault(date);
-        Statistic weeklyStatistic = statisticParser.getWeeklyData(date);
-        Statistic allTimeStatistic = statisticParser.getAllTimeData();
-
-        SubjectDTO subjectDto = modelMapper.map(subject, SubjectDTO.class);
-        subjectDto.setDailyStatistic(Statistic.toReadDto(dailyStatistic));
-        subjectDto.setWeeklyStatistic(Statistic.toReadDto(weeklyStatistic));
-        subjectDto.setAllTimeStatistic(Statistic.toReadDto(allTimeStatistic));
-
-        subjectDto.setWeeklyGoals(mapWeeklyGoalsToDto(subject.getGoals()));
-        subjectDto.setAllTimeGoals(mapAllTimeGoalsToDto(subject.getGoals()));
-
-        return subjectDto;
-    }
-
-    private ReadGoalDTO mapWeeklyGoalsToDto(SubjectGoals subjectGoals) {
-        ReadGoalDTO readGoalDto = new ReadGoalDTO();
-
-        for (StatisticType statisticType : StatisticType.values()) {
-            float goalValue = subjectGoals.getWeeklyGoal(statisticType);
-
-            setStatisticTypeToGoalDto(readGoalDto, statisticType, goalValue);
-        }
-
-        return readGoalDto;
-    }
-
-    private ReadGoalDTO mapAllTimeGoalsToDto(SubjectGoals subjectGoals) {
-        ReadGoalDTO readGoalDto = new ReadGoalDTO();
-
-        for (StatisticType statisticType : StatisticType.values()) {
-            float goalValue = subjectGoals.getAllTimeGoal(statisticType);
-
-            setStatisticTypeToGoalDto(readGoalDto, statisticType, goalValue);
-        }
-
-        return readGoalDto;
-    }
-
-    private void setStatisticTypeToGoalDto(ReadGoalDTO readGoalDto, StatisticType statisticType, float goalValue) {
-        switch (statisticType) {
-            case HOURS -> readGoalDto.setHours(goalValue);
-            case QUESTIONS -> readGoalDto.setQuestions((int) goalValue);
-            case REVIEWS -> readGoalDto.setReviews((int) goalValue);
         }
     }
 }

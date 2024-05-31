@@ -1,10 +1,13 @@
 package br.studyleague.api.model.student;
 
-import br.studyleague.api.controller.util.datetime.DateRange;
+import br.studyleague.api.controller.util.datetime.DateTimeUtils;
 import br.studyleague.api.model.Credential;
+import br.studyleague.api.model.scheduling.StudySchedulingMethod;
+import enums.StudySchedulingMethods;
+import br.studyleague.api.model.scheduling.studycycle.StudyCycle;
 import br.studyleague.api.model.aggregabledata.StudentAggregableData;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
-import br.studyleague.api.model.student.schedule.Schedule;
+import br.studyleague.api.model.scheduling.schedule.Schedule;
 import br.studyleague.api.model.subject.Subject;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -13,7 +16,6 @@ import lombok.experimental.Delegate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Entity
@@ -36,6 +38,11 @@ public class Student {
     @OneToOne(cascade = CascadeType.ALL)
     private Schedule schedule = new Schedule();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private StudyCycle studyCycle = new StudyCycle();
+
+    private StudySchedulingMethods currentStudySchedulingMethod;
+
     @Delegate
     @OneToOne(cascade = CascadeType.ALL)
     private StudentAggregableData aggregableData = new StudentAggregableData();
@@ -44,38 +51,57 @@ public class Student {
         return aggregableData.getStatisticManager().getRawStatistics();
     }
 
-    public void syncStatisticsWithSubjects(LocalDate updatedDate) {
-        List<Subject> todaySubjects = schedule.getSubjects(updatedDate.getDayOfWeek());
-
-        Statistic newDailyStatistic = sumSubjectStatistics(updatedDate, todaySubjects);
-        newDailyStatistic.setDate(updatedDate);
-
-        aggregableData.getStatisticManager().setStatisticValue(updatedDate, newDailyStatistic);
-        syncGradesByDate(updatedDate);
+    public void syncGrades() {
+        syncGradesByDate(DateTimeUtils.timezoneOffsettedNowDate());
     }
 
     public void syncGradesByDate(LocalDate updatedDate) {
-        Map<Subject, Float> subjectWithHoursToStudyToday = schedule.getSubjectsWithDailyHourTarget(updatedDate.getDayOfWeek());
-        aggregableData.syncDailyGrade(updatedDate, subjectWithHoursToStudyToday);
+        getStudySchedulingMethod().syncGradesByDate(this, updatedDate);
+    }
 
-        DateRange weekRange = DateRange.calculateWeeklyRange(updatedDate);
-        aggregableData.syncWeeklyGrade(weekRange, subjects);
+    public StudySchedulingMethod getStudySchedulingMethod() {
+        return switch (getCurrentStudySchedulingMethod()) {
+            case STUDYCYCLE -> getStudyCycle();
+            case SCHEDULE -> getSchedule();
+        };
+    }
+
+    public void syncStatisticsWithSubjects(LocalDate updatedDate) {
+        List<Subject> todaySubjects = getStudySchedulingMethod().getSubjects(updatedDate.getDayOfWeek());
+
+        Statistic newDailyStatistic = Subject.sumSubjectStatistics(updatedDate, todaySubjects);
+        newDailyStatistic.setDate(updatedDate);
+
+        aggregableData.getStatisticManager().setStatisticValue(updatedDate, newDailyStatistic);
+
+        syncGradesByDate(updatedDate);
     }
 
     public Subject findSubjectById(Long subjectId) {
-        return subjects.stream()
-                .filter(subject -> subject.getId().equals(subjectId))
-                .findFirst()
-                .orElseThrow();
+        return subjects.stream().filter(subject -> subject.getId().equals(subjectId)).findFirst().orElseThrow();
     }
 
-    private static Statistic sumSubjectStatistics(LocalDate date, List<Subject> subjects) {
-        List<Statistic> subjectStatistics = new ArrayList<>();
-        for (Subject subject : subjects) {
-            Statistic subjectStatistic = Statistic.parse(subject.getDailyStatistics()).getDailyDataOrDefault(date);
-            subjectStatistics.add(subjectStatistic);
+    public StudySchedulingMethods getCurrentStudySchedulingMethod() {
+        if (currentStudySchedulingMethod == null) {
+            currentStudySchedulingMethod = StudySchedulingMethods.Companion.getDefaultValue();
         }
 
-        return new Statistic().addAll(subjectStatistics);
+        return currentStudySchedulingMethod;
+    }
+
+    public StudyCycle getStudyCycle() {
+        if (studyCycle == null) {
+            studyCycle = new StudyCycle();
+        }
+
+        return studyCycle;
+    }
+
+    public Schedule getSchedule() {
+        if (schedule == null) {
+            schedule = new Schedule();
+        }
+
+        return schedule;
     }
 }

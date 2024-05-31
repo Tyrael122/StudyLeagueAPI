@@ -5,15 +5,14 @@ import br.studyleague.api.model.Credential;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.Statistic;
 import br.studyleague.api.model.student.Student;
-import br.studyleague.api.model.subject.Subject;
+import br.studyleague.api.model.util.Mapper;
 import br.studyleague.api.model.util.aggregable.RawDataParser;
 import br.studyleague.api.repository.StudentRepository;
 import dtos.signin.CredentialDTO;
 import dtos.signin.SignUpStudentData;
 import dtos.student.StudentDTO;
 import dtos.student.StudentStatisticsDTO;
-import enums.StatisticType;
-import org.modelmapper.ModelMapper;
+import enums.StudySchedulingMethods;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,18 +21,17 @@ import org.springframework.web.server.ResponseStatusException;
 import util.EndpointPrefixes;
 
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Optional;
+
+import static br.studyleague.api.model.util.Mapper.statisticsToReadDto;
 
 @RestController
 public class StudentController {
     private final String ENDPOINT_PREFIX = EndpointPrefixes.STUDENT;
-    private final ModelMapper modelMapper;
 
     private final StudentRepository studentRepository;
 
-    public StudentController(ModelMapper modelMapper, StudentRepository studentRepository) {
-        this.modelMapper = modelMapper;
+    public StudentController(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
 
@@ -47,12 +45,12 @@ public class StudentController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas!");
         }
 
-        return ResponseEntity.ok(mapStudentToDto(student));
+        return ResponseEntity.ok(Mapper.studentToDto(student));
     }
 
     @PostMapping(ENDPOINT_PREFIX)
-    public ResponseEntity<StudentDTO> create(@RequestBody SignUpStudentData signUpData) {
-        Student student = modelMapper.map(signUpData.getStudent(), Student.class);
+    public ResponseEntity<StudentDTO> createStudent(@RequestBody SignUpStudentData signUpData) {
+        Student student = Mapper.studentFromDto(signUpData.getStudent());
         Credential credential = encryptCredentialPassword(signUpData.getCredential());
 
         Optional<Student> matchedStudent = studentRepository.findByCredential_Email(credential.getEmail());
@@ -62,16 +60,16 @@ public class StudentController {
 
         student.setCredential(credential);
 
-        studentRepository.save(student);
+        student = studentRepository.save(student);
 
-        return ResponseEntity.ok(mapStudentToDto(student));
+        return ResponseEntity.ok(Mapper.studentToDto(student));
     }
 
     @GetMapping(EndpointPrefixes.STUDENT_ID)
     public ResponseEntity<StudentDTO> getById(@PathVariable Long studentId) {
         Student student = studentRepository.findById(studentId).orElseThrow();
 
-        return ResponseEntity.ok(mapStudentToDto(student));
+        return ResponseEntity.ok(Mapper.studentToDto(student));
     }
 
     @GetMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.STATS)
@@ -84,8 +82,20 @@ public class StudentController {
         return ResponseEntity.ok(studentStatsDto);
     }
 
+    @PostMapping(EndpointPrefixes.STUDENT_ID + EndpointPrefixes.CHANGE_SCHEDULE_METHOD)
+    public ResponseEntity<StudentDTO> changeScheduleMethod(@PathVariable Long studentId, @RequestParam StudySchedulingMethods newMethod) {
+        Student student = studentRepository.findById(studentId).orElseThrow();
+
+        student.setCurrentStudySchedulingMethod(newMethod);
+        student.syncGrades();
+
+        studentRepository.save(student);
+
+        return ResponseEntity.ok().build();
+    }
+
     private Credential encryptCredentialPassword(CredentialDTO credentialDto) {
-        Credential credential = modelMapper.map(credentialDto, Credential.class);
+        Credential credential = Mapper.credentialFromDto(credentialDto);
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(credential.getPassword());
 
@@ -111,37 +121,13 @@ public class StudentController {
         studentStatsDto.setWeeklyGrade(weeklyGrade);
         studentStatsDto.setMonthlyGrade(monthlyGrade);
 
-        studentStatsDto.setHoursGoalsCompleted(calculateHoursGoalsCompleted(student, date));
+        int hoursGoalsCompleted = student.getStudySchedulingMethod().calculateHoursGoalsCompleted(student, date);
+        studentStatsDto.setHoursGoalsCompleted(hoursGoalsCompleted);
 
-        studentStatsDto.setDailyStatistic(Statistic.toReadDto(dailyStatistic));
-        studentStatsDto.setWeeklyStatistic(Statistic.toReadDto(weeklyStatistic));
-        studentStatsDto.setAllTimeStatistic(Statistic.toReadDto(allTimeStatistic));
+        studentStatsDto.setDailyStatistic(statisticsToReadDto(dailyStatistic));
+        studentStatsDto.setWeeklyStatistic(statisticsToReadDto(weeklyStatistic));
+        studentStatsDto.setAllTimeStatistic(statisticsToReadDto(allTimeStatistic));
 
         return studentStatsDto;
-    }
-
-    private int calculateHoursGoalsCompleted(Student student, LocalDate date) {
-        Map<Subject, Float> subjectsToStudy = student.getSchedule().getSubjectsWithDailyHourTarget(date.getDayOfWeek());
-
-        int hoursGoalsCompleted = 0;
-        for (Subject subject : subjectsToStudy.keySet()) {
-            float hoursStudied = Statistic.parse(subject.getDailyStatistics()).getDailyDataOrDefault(date).getValue(StatisticType.HOURS);
-            float hoursGoal = subjectsToStudy.get(subject);
-
-            if (hoursStudied >= hoursGoal) {
-                hoursGoalsCompleted++;
-            }
-        }
-
-        return hoursGoalsCompleted;
-    }
-
-    private StudentDTO mapStudentToDto(Student student) {
-        StudentDTO studentDto = modelMapper.map(student, StudentDTO.class);
-
-        String email = student.getCredential().getEmail();
-        studentDto.setEmail(email);
-
-        return studentDto;
     }
 }

@@ -3,17 +3,12 @@ package br.studyleague.api.model.aggregabledata;
 import br.studyleague.api.controller.util.datetime.DateRange;
 import br.studyleague.api.model.aggregabledata.grade.Grade;
 import br.studyleague.api.model.aggregabledata.statistics.DailyStatisticsManager;
-import br.studyleague.api.model.subject.Subject;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import static br.studyleague.api.model.util.GradeCalculator.calculateDailyGrade;
-import static br.studyleague.api.model.util.GradeCalculator.calculateWeeklyGrade;
 
 @Data
 @Entity
@@ -32,16 +27,13 @@ public class StudentAggregableData {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Grade> weeklyGrades = new ArrayList<>();
 
-    public void syncDailyGrade(LocalDate date, Map<Subject, Float> subjectWithHoursToStudyToday) {
-        float studentDailyGrade = calculateDailyGrade(date, subjectWithHoursToStudyToday);
+    public void setDailyGrade(LocalDate date, float studentDailyGrade) {
         DateRange dateRange = new DateRange(date, date);
 
         setGrade(dailyGrades, dateRange, studentDailyGrade);
     }
 
-    public void syncWeeklyGrade(DateRange weekRange, List<Subject> subjects) {
-        float studentWeeklyGrade = calculateWeeklyGrade(weekRange, subjects);
-
+    public void setWeeklyGrade(DateRange weekRange, float studentWeeklyGrade) {
         setGrade(weeklyGrades, weekRange, studentWeeklyGrade);
     }
 

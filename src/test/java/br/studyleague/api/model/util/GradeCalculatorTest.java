@@ -18,123 +18,85 @@ class GradeCalculatorTest {
     private final LocalDate currentDate = LocalDate.now();
 
     @Test
-    void calculateRealCaseWeeklyGrade() {
-        List<Subject> subjects = mockRealCaseSubjects();
+    void calculateWeeklyGrade() {
+        float grade = GradeCalculator.calculateWeeklyGrade(1F, 1F, 1F);
 
-        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
-        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
-
-        assertEquals(1.54495370388031, grade);
+        assertEquals(10F, grade);
     }
 
     @Test
-    void calculateMaxWeeklyGradeWithExtraPointWhenReachingAllGoals() {
-        List<Subject> subjects = mockPerfectSubjects();
+    void calculateWeeklyGradeWithZeroedGrade() {
+        float grade = GradeCalculator.calculateWeeklyGrade(1F, 0F, 1F);
 
-        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
-        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
-
-        assertEquals(10, grade);
+        assertEquals(6.666F, grade, 0.1);
     }
 
     @Test
-    void calculateWeeklyGradeWhenNoGoalsSet() {
-        List<Subject> subjects = new ArrayList<>();
+    void calculateWeeklyGradeWithAllZeroedGrades() {
+        float grade = GradeCalculator.calculateWeeklyGrade(0F, 0F, 0F);
 
-        subjects.add(mockSubject("Física", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)));
-        subjects.add(mockSubject("Artes", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)));
-        subjects.add(mockSubject("Direito", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)));
-
-        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
-        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
-
-        assertEquals(0, grade);
+        assertEquals(0F, grade);
     }
 
     @Test
     void calculateWeeklyGradeWithExtraPoint() {
-        List<Subject> subjects = new ArrayList<>();
+        float grade = GradeCalculator.calculateWeeklyGrade(1F, 0.9F, 1.1F);
 
-        subjects.add(mockSubject("Economia", List.of(3F, 100F, 100F), List.of(3F, 110F, 110F)));
-        subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 110F, 110F)));
-        subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
-
-        DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
-        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
-
-        assertEquals(10, grade);
+        assertEquals(10F, grade);
     }
 
     @Test
-    void weeklyGradeLimitsAmountOfExtraPoints() {
-        List<Subject> subjects = new ArrayList<>();
-
-        subjects.add(mockSubject("Economia", List.of(3F, 100F, 100F), List.of(3F, 1000F, 1000F)));
-        subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 1000F, 1000F)));
-        subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
-
+    void calculatePerfectStatisticsGrade() {
         DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
-        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
+        List<Subject> subjects = mockPerfectSubjects();
 
-        assertEquals(10, grade);
+        float grade = GradeCalculator.calculateQuestionsGrade(weekRange, subjects);
+        assertEquals(1F, grade);
+
+        grade = GradeCalculator.calculateReviewsGrade(weekRange, subjects);
+        assertEquals(1F, grade);
     }
 
     @Test
-    void weeklyGradeGivesProportionalPoints() {
-        List<Subject> subjects = new ArrayList<>();
-
-        subjects.add(mockSubject("Economia", List.of(3F, 100F, 100F), List.of(3F, 105F, 105F)));
-        subjects.add(mockSubject("Biologia", List.of(3F, 100F, 100F), List.of(3F, 105F, 105F)));
-        subjects.add(mockSubject("Geologia", List.of(3F, 100F, 100F), List.of(3F, 80F, 80F)));
-
+    void calculateSurpassedStatisticsGrade() {
         DateRange weekRange = DateRange.calculateWeeklyRange(currentDate);
-        float grade = GradeCalculator.calculateWeeklyGrade(weekRange, subjects);
 
-        assertTrue(grade > 9.5 && grade < 10);
+        List<Subject> subjects = new ArrayList<>();
+        subjects.add(mockSubject("Geografia", List.of(3F, 60F, 160F), List.of(3F, 66F, 176F)));
+
+        float grade = GradeCalculator.calculateQuestionsGrade(weekRange, subjects);
+        assertEquals(1.1F, grade);
+
+        grade = GradeCalculator.calculateReviewsGrade(weekRange, subjects);
+        assertEquals(1.1F, grade);
     }
 
     @Test
     void calculateDailyGrade() {
-        Map<Subject, Float> subjectWithHoursToStudyToday = Map.of(
-                mockSubject("Física", List.of(0F, 0F, 0F), List.of(1F, 0F, 0F)), 2F,
-                mockSubject("Artes", List.of(0F, 0F, 0F), List.of(1F, 0F, 0F)), 2F
-        );
+        float grade = GradeCalculator.calculateDailyGrade(1F, 1F);
 
-        float grade = GradeCalculator.calculateDailyGrade(currentDate, subjectWithHoursToStudyToday);
-        assertEquals(5, grade);
+        assertEquals(10F, grade);
     }
 
     @Test
-    void calculateDailyGradeWhenGoalsAreEmpty() {
-        Map<Subject, Float> subjectWithHoursToStudyToday = Map.of(
-                mockSubject("Física", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)), 0F,
-                mockSubject("Artes", List.of(0F, 0F, 0F), List.of(0F, 0F, 0F)), 0F
-        );
+    void calculateDailyGradeWithZeroedGoal() {
+        float grade = GradeCalculator.calculateDailyGrade(1F, 0F);
 
-        float grade = GradeCalculator.calculateDailyGrade(currentDate, subjectWithHoursToStudyToday);
-        assertEquals(0, grade);
+        assertEquals(0F, grade);
     }
 
     @Test
-    void calculateDailyGradeWhenGoalsAreMet() {
-        Map<Subject, Float> subjectWithHoursToStudyToday = Map.of(
-                mockSubject("Física", List.of(0F, 0F, 0F), List.of(2F, 0F, 0F)), 2F,
-                mockSubject("Artes", List.of(0F, 0F, 0F), List.of(2F, 0F, 0F)), 2F
-        );
+    void calculateZeroedDailyGrade() {
+        float grade = GradeCalculator.calculateDailyGrade(0F, 1F);
 
-        float grade = GradeCalculator.calculateDailyGrade(currentDate, subjectWithHoursToStudyToday);
-        assertEquals(10, grade);
+        assertEquals(0F, grade);
     }
 
     @Test
-    void calculateDailyGradeWhenGoalsAreSurpassed() {
-        Map<Subject, Float> subjectWithHoursToStudyToday = Map.of(
-                mockSubject("Física", List.of(0F, 0F, 0F), List.of(10F, 0F, 0F)), 2F,
-                mockSubject("Artes", List.of(0F, 0F, 0F), List.of(10F, 0F, 0F)), 2F
-        );
+    void calculateDailyGradeHalved() {
+        float grade = GradeCalculator.calculateDailyGrade(0.5F, 1F);
 
-        float grade = GradeCalculator.calculateDailyGrade(currentDate, subjectWithHoursToStudyToday);
-        assertEquals(10, grade);
+        assertEquals(5F, grade);
     }
 
     private List<Subject> mockPerfectSubjects() {
@@ -142,24 +104,6 @@ class GradeCalculatorTest {
 
         subjects.add(mockSubject("Física", List.of(3F, 60F, 160F), List.of(3F, 60F, 160F)));
         subjects.add(mockSubject("Artes", List.of(3F, 60F, 160F), List.of(3F, 60F, 160F)));
-
-        return subjects;
-    }
-
-    private List<Subject> mockRealCaseSubjects() {
-        List<Subject> subjects = new ArrayList<>();
-
-        subjects.add(mockSubject("Direito Constitucional", List.of(3.0F, 60F, 160F), List.of(1.0F, 21F, 75F)));
-        subjects.add(mockSubject("Direito Administrativo", List.of(3.0F, 60F, 160F), List.of(0F, 0F, 0F)));
-        subjects.add(mockSubject("Auditoria", List.of(3.0F, 60F, 200F), List.of(1.0F, 28F, 97F)));
-        subjects.add(mockSubject("Contabilidade", List.of(4.0F, 80F, 300F), List.of(0F, 0F, 0F)));
-        subjects.add(mockSubject("Direito Tributário", List.of(3.0F, 60F, 200F), List.of(1.0F, 13F, 100F)));
-        subjects.add(mockSubject("Português", List.of(5.0F, 80F, 200F), List.of(0F, 0F, 0F)));
-        subjects.add(mockSubject("Matemática", List.of(3.0F, 40F, 60F), List.of(0F, 0F, 0F)));
-        subjects.add(mockSubject("Legislação Tributária", List.of(4.0F, 60F, 200F), List.of(1.0F, 7F, 88F)));
-        subjects.add(mockSubject("Direito Penal, Civil e Empresarial", List.of(6.0F, 90F, 300F), List.of(0F, 0F, 0F)));
-        subjects.add(mockSubject("Informática", List.of(4.0F, 60F, 200F), List.of(1.0F, 0F, 96F)));
-        subjects.add(mockSubject("Anki diário", List.of(7.0F, 0F, 0F), List.of(0F, 0F, 0F)));
 
         return subjects;
     }

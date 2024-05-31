@@ -1,4 +1,4 @@
-package br.studyleague.api.model.student.schedule;
+package br.studyleague.api.model.scheduling.schedule;
 
 import br.studyleague.api.model.subject.Subject;
 import jakarta.persistence.Entity;
